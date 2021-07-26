@@ -1,10 +1,78 @@
 <plugin>
-    <b>This plugin will rock</b>
+    <b>Mscolab Windy Interface</b>
+    <div class="plugin-content">
+        <h2>Please enter credentials</h2>
 
+        <input type="text" id="mscolab_url" value="http://localhost:8083" placeholder="Mscolab URL">
+        <input type="text" id="mscolab_email" value="test@test" placeholder="Your Email">
+        <input type="text" id="mscolab_password" value="test" placeholder="Your Password">
+        <button id="mscolab_login">Login</button>
+
+        <div id="post_login">
+        </div>
+        <div id="project_list">
+        </div>
+    </div>
     <script>
-        console.log('I am mounted to the page');
+        var websocket = null;
+        var token = null;
+        var projects = null;
+        var userId = null;
+        var msc_url = "http://localhost:8083"
 
-        this.onopen = () => console.log('I am opened');
+        function requestMsc(endpoint="", method="Get", data={"token": token}, callback=null){
+            var url = msc_url + "/" + endpoint;
+            var request_data = {}
+            if(method == "Get"){
+                var start_char = "?";
+                for(var key in data){
+                    url += start_char + key + "=" + data[key];
+                    start_char = "&";
+                }
+                request_data = {method: method}
+            } else {
+                var formdata = new FormData();
+                for (var key in data) {
+                    formdata.append(key, data[key]);
+                }
+                request_data = {method: method, body: formdata}
+            }
+            if(callback == null){
+                return fetch(url, request_data).then(response => {console.log(response); return response.json();});
+            } else {
+                fetch(url, request_data).then(response => {console.log(response); return response.json();}).then(r_data => callback(r_data));
+            }
+        }
+
+        function listProjects(response_data){
+            projects = response_data["projects"];
+            document.getElementById("project_list").innerHTML = `Projects: <select name="projects" id="selected_project"></select>`;
+            for(var project_index in projects){
+                var project = projects[project_index];
+                document.getElementById("selected_project").innerHTML += `<option value="${project['path']}">${project["path"]}</option>`;
+            }
+        }
+
+        function postLogin(response_data){
+            token = response_data["token"];
+            var data = {"token": token}
+            var username = response_data["user"]["username"];
+            userId = response_data["user"]["id"];
+            var test = document.getElementById("post_login");
+            test.innerHTML = "Logged in as " + username;
+            requestMsc("projects", "Get", data, listProjects);
+        }
+
+        function loginMsc(){
+            msc_url = document.getElementById("mscolab_url").value;
+            var email = document.getElementById("mscolab_email").value;
+            var password = document.getElementById("mscolab_password").value;
+            var data = {"password": password, "email": email};
+            requestMsc("token", "Post", data, postLogin);
+        }
+        console.log('I am mounted to the page');
+        console.log(loginMsc);
+        document.getElementById("mscolab_login").onclick = loginMsc;
 
         this.onclose = () => console.log('I am being closed');
     </script>
