@@ -14,11 +14,21 @@
         </div>
     </div>
     <script>
+        import map from '@windy/map';
+        import bcast from '@windy/broadcast';
         var websocket = null;
         var token = null;
         var projects = null;
         var userId = null;
-        var msc_url = "http://localhost:8083"
+        var msc_url = "http://localhost:8083";
+        var waypoints = [];
+        var markers = [];
+
+        const icon = L.divIcon({
+            className: 'weather-at-city',
+            iconSize: [80, 40],
+            iconAnchor: [40, 20],
+        });
 
         function requestMsc(endpoint="", method="Get", data={"token": token}, callback=null){
             var url = msc_url + "/" + endpoint;
@@ -44,13 +54,50 @@
             }
         }
 
-        function listProjects(response_data){
-            projects = response_data["projects"];
-            document.getElementById("project_list").innerHTML = `Projects: <select name="projects" id="selected_project"></select>`;
-            for(var project_index in projects){
-                var project = projects[project_index];
-                document.getElementById("selected_project").innerHTML += `<option value="${project['path']}">${project["path"]}</option>`;
+        function drawWaypoints(){
+            if (markers) {
+                markers.forEach(m => map.removeLayer(m));
+                // bcast.off('redrawFinished', interpolateValues);
+                markers = [];
             }
+            const latlons = waypoints.map(x => [x["lat"], x["lon"]]);
+            const line = L.polyline(latlons, {
+                            color: `rgb(20, 20, 140)`,
+                            weight: 4,
+                        }).addTo(map);
+            markers.push(line);
+
+            for(var waypoint of waypoints){
+                const marker = L.marker([waypoint["lat"], waypoint["lon"]]).addTo(map);
+                marker.bindPopup(waypoint["name"]);
+                markers.push(marker);
+            }
+        }
+
+        function projectSelected(){
+            var id = getSelectedProject();
+
+            function loadProject(response_data){
+                var parser = new DOMParser();
+                var project = parser.parseFromString(response_data.content, "text/xml");
+                var xml_waypoints = project.getElementsByTagName("Waypoint");
+                waypoints = [];
+                for(var waypoint of xml_waypoints){
+                    const lat = waypoint.getAttribute("lat");
+                    const lon = waypoint.getAttribute("lon");
+                    const alt = waypoint.getAttribute("flightlevel");
+                    const name = waypoint.getAttribute("location");
+                    waypoints.push({"lat": lat, "lon": lon, "alt": alt, "name": name})
+                }
+                drawWaypoints();
+            }
+
+            var data = {"token": token, "p_id": id};
+            requestMsc("get_project_by_id", "Get", data, loadProject);
+        }
+
+        function getSelectedProject(){
+            return document.getElementById("selected_project").value;
         }
 
         function postLogin(response_data){
@@ -60,6 +107,16 @@
             userId = response_data["user"]["id"];
             var test = document.getElementById("post_login");
             test.innerHTML = "Logged in as " + username;
+
+            function listProjects(response_data){
+                projects = response_data["projects"];
+                document.getElementById("project_list").innerHTML = `Projects: <select name="projects" id="selected_project"></select>`;
+                for(var project_index in projects){
+                    var project = projects[project_index];
+                    document.getElementById("selected_project").innerHTML += `<option value="${project['p_id']}">${project["path"]}</option>`;
+                }
+                document.getElementById("selected_project").onchange = projectSelected;
+            }
             requestMsc("projects", "Get", data, listProjects);
         }
 
@@ -70,6 +127,7 @@
             var data = {"password": password, "email": email};
             requestMsc("token", "Post", data, postLogin);
         }
+
         console.log('I am mounted to the page');
         console.log(loginMsc);
         document.getElementById("mscolab_login").onclick = loginMsc;

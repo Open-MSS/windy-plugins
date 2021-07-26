@@ -8,7 +8,7 @@ module.exports = {
 
     // List of external libraries, that should be loaded before
     // your plugin is even mounted to the page
-    // dependencies: ['@babel/plugin-transform-runtime'],
+    // dependencies: ['https://unpkg.com/windy-plugin-fp'],
 
     // List of classnames that will be attached to your plugin upon mounting
     className: 'plugin-lhpane plugin-mobile-fullscreen',
