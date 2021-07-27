@@ -1,16 +1,24 @@
 <plugin>
     <b>Mscolab Windy Interface</b>
     <div class="plugin-content">
-        <h2>Please enter credentials</h2>
+        <div class="tab">
+            <button class="tablinks active" id="login_link">Login</button>
+            <button class="tablinks" id="project_link">Projects</button>
+          </div>
+        <div id="login_tab" class="tabcontent" style="display: block;">
+            Please enter credentials <br>
 
-        <input type="text" id="mscolab_url" value="http://localhost:8083" placeholder="Mscolab URL">
-        <input type="text" id="mscolab_email" value="test@test" placeholder="Your Email">
-        <input type="text" id="mscolab_password" value="test" placeholder="Your Password">
-        <button id="mscolab_login">Login</button>
-
-        <div id="post_login">
+            <input type="text" id="mscolab_url" value="http://localhost:8083" placeholder="Mscolab URL">
+            <input type="text" id="mscolab_email" value="test@test" placeholder="Your Email">
+            <input type="text" id="mscolab_password" value="test" placeholder="Your Password">
+            <button id="mscolab_login">Login</button>
         </div>
-        <div id="project_list">
+
+        <div id="project_tab" class="tabcontent">
+            <div id="project_username"></div><br>
+            <div id="project_list"></div><br>
+            Waypoints<br>
+            <ul id="waypoint_list"></ul>
         </div>
     </div>
     <script>
@@ -23,12 +31,28 @@
         var msc_url = "http://localhost:8083";
         var waypoints = [];
         var markers = [];
+        var socket = null;
 
         const icon = L.divIcon({
             className: 'weather-at-city',
             iconSize: [80, 40],
             iconAnchor: [40, 20],
         });
+
+        function openTab(tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            
+            document.getElementById(tabName).style.display = "block";
+            document.getElementById(tabName.replace("tab", "link")).className += " active";
+        }
 
         function requestMsc(endpoint="", method="Get", data={"token": token}, callback=null){
             var url = msc_url + "/" + endpoint;
@@ -54,10 +78,25 @@
             }
         }
 
+        function projectUpdated(event){
+            console.log(event);
+            event = JSON.parse(event);
+            const p_id = event["p_id"];
+            const u_id = event["u_id"];
+            if(p_id == getSelectedProject() && u_id != userId){
+                console.log('Updating project ' + p_id);
+                projectSelected();
+            }
+        }
+
+        function addWaypoint(event){
+            const latlon = event.latlng;
+            console.log(latlon);
+        }
+
         function drawWaypoints(){
             if (markers) {
                 markers.forEach(m => map.removeLayer(m));
-                // bcast.off('redrawFinished', interpolateValues);
                 markers = [];
             }
             const latlons = waypoints.map(x => [x["lat"], x["lon"]]);
@@ -66,11 +105,17 @@
                             weight: 4,
                         }).addTo(map);
             markers.push(line);
-
-            for(var waypoint of waypoints){
+            
+            document.getElementById("waypoint_list").innerHTML = "";
+            for(var i = 0; i < waypoints.length; i++){
+                const waypoint = waypoints[i];
+                document.getElementById("waypoint_list").innerHTML += `<li id="WP_${i}">${i + 1}. (${waypoint["lat"]}, ${waypoint["lon"]}) ${waypoint["name"]}</li>`;
                 const marker = L.marker([waypoint["lat"], waypoint["lon"]]).addTo(map);
                 marker.bindPopup(waypoint["name"]);
                 markers.push(marker);
+            }
+            for(var i = 0; i < waypoints.length; i++){
+                document.getElementById("WP_"+i).onclick = waypoints[i]["zoom"];
             }
         }
 
@@ -82,13 +127,25 @@
                 var project = parser.parseFromString(response_data.content, "text/xml");
                 var xml_waypoints = project.getElementsByTagName("Waypoint");
                 waypoints = [];
+                var max_lat = -1000;
+                var min_lat = 1000;
+                var max_lon = -1000;
+                var min_lon = 1000;
                 for(var waypoint of xml_waypoints){
                     const lat = waypoint.getAttribute("lat");
                     const lon = waypoint.getAttribute("lon");
                     const alt = waypoint.getAttribute("flightlevel");
                     const name = waypoint.getAttribute("location");
-                    waypoints.push({"lat": lat, "lon": lon, "alt": alt, "name": name})
+                    max_lat = max_lat < lat ? lat : max_lat;
+                    max_lon = max_lon < lon ? lon : max_lon;
+                    min_lat = min_lat > lat ? lat : min_lat;
+                    min_lon = min_lon > lon ? lon : min_lon;
+                    waypoints.push({"lat": lat, "lon": lon, "alt": alt, "name": name, "zoom": () => map.setView({ lat: lat, lng: lon })})
                 }
+                var southWest = L.latLng(min_lat, min_lon),
+                    northEast = L.latLng(max_lat, max_lon),
+                    bounds = L.latLngBounds(southWest, northEast);
+                map.fitBounds(bounds);
                 drawWaypoints();
             }
 
@@ -105,8 +162,24 @@
             var data = {"token": token}
             var username = response_data["user"]["username"];
             userId = response_data["user"]["id"];
-            var test = document.getElementById("post_login");
+            var test = document.getElementById("project_username");
             test.innerHTML = "Logged in as " + username;
+            socket = io.connect(msc_url);
+            // Add a connect listener
+            socket.on('connect',function() {
+                console.log('Client has connected to the server!');
+                socket.emit("start", data);
+            });
+            // Add a connect listener
+            socket.on('file-changed', projectUpdated);
+            // Add a disconnect listener
+            socket.on('disconnect',function() {
+                console.log('The client has disconnected!');
+                socket.disconnect();
+                openTab("login_tab");
+            });
+
+            openTab("project_tab")
 
             function listProjects(response_data){
                 projects = response_data["projects"];
@@ -131,6 +204,9 @@
         console.log('I am mounted to the page');
         console.log(loginMsc);
         document.getElementById("mscolab_login").onclick = loginMsc;
+        document.getElementById("login_link").onclick = () => openTab("login_tab");
+        document.getElementById("project_link").onclick = () => openTab("project_tab");
+        map.on("click", addWaypoint);
 
         this.onclose = () => console.log('I am being closed');
     </script>
