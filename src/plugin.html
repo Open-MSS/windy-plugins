@@ -93,7 +93,7 @@
                 .replace("COMMENT", com).replace("LOCATION", name));
             }
             const file = xmlBegin + xmlWaypoints.join() + xmlEnd;
-            socket.emit("file-save", {"token": token, "p_id": getSelectedProject(), "content": file, "comment": "Updated through Windy."});
+            socket.emit("file-save", {"token": token, "p_id": parseInt(getSelectedProject()), "content": file, "comment": "Updated through Windy."});
         }
 
         function projectUpdated(event){
@@ -134,7 +134,7 @@
         }
 
         function removeWaypoint(index){
-            if(waypoints.length > 0){
+            if(waypoints.length > 2){
                 const latlon = event.latlng;
                 console.log(`Waypoint ${index} removed`);
                 waypoints.splice(index, 1);
