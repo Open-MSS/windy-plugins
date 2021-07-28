@@ -1,5 +1,11 @@
 "use strict";
 
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 /**
  * This is main plugin loading function
  * Feel free to write your own compiler
@@ -7,124 +13,381 @@
 W.loadPlugin(
 /* Mounting options */
 {
-  "name": "windy-plugin-examples",
-  "version": "0.5.0",
-  "author": "Windyty, S.E.",
+  "name": "windy-plugin-mscolab",
+  "version": "0.1.0",
+  "author": "May Bär",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/windycom/windy-plugins"
+    "url": "git+https://github.com/Marilyth/windy-plugins"
   },
-  "description": "Windy plugin system enables anyone, with basic knowledge of Javascript to enhance Windy with new functionality (default desc).",
-  "displayName": "drag demo",
-  "hook": "contextmenu",
-  "className": "plugin-lhpane",
-  "classNameMobile": "plugin-mobile-bottom-slide",
-  "exclusive": "lhpane"
+  "description": "Enables users to connect to and interact with a mscolab server.",
+  "displayName": "Mscolab",
+  "hook": "menu",
+  "dependencies": ["https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"],
+  "className": "plugin-lhpane plugin-mobile-fullscreen"
 },
 /* HTML */
-'<div class="mobile-header"> Drag demo </div> <div class="plugin-content"> <div class="mobile-title">Drag demo</div> <h3 class="section-title">Drag demo</h3> <div id="dragdemo-container"> <div id="dragdemo-x"></div> <div id="dragdemo-y"></div> <div id="dragdemo-box"></div> </div> <div style=" border:1px solid blue; border-radius:5px; padding:10px; margin:5px; "> <h2>This plugin is:</h2> <br> <ul style="margin-left:20px;"> <li> A boilerplate for building plugins for a mobile browser (plugins not accessible in the app). </li> <li> A demonstration on how to use the bottomSlider mechanism to close the plugin pane on mobile. </li> <li> I have also modified the bottomSlider so that the plugin pane can be dragged down partially, to display part of the map and the picker. </li> <li>The Drag class is also demonstrated:</li> <ul style="margin-left:20px;"> <li>You can drag the circle in the box above, or</li> <li> If you drag the open white area the cross hairs will move. </li> </ul> <li> The z-index of the plugin is set to 10 so that it appears on top of the picker. </li> <li> The z-index of the bottom element is set to 20, so that the calendar is on top of the plugin. </li> <li> A backdrop (linear-gradient background image) is created for the calendar timecode. </li> <li> The rest of this block is just to demonstrate scrolling. When you scroll down the "mobile-header" class becomes visible. </li> </ul> <br><br> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. </div> </div> <div class="calendar-backdrop"></div>',
+'<b>Mscolab Windy Interface</b> <div class="plugin-content"> <div class="tab"> <button class="tablinks active" id="login_link">Login</button> <button class="tablinks" id="project_link">Projects</button> </div> <div id="login_tab" class="tabcontent" style="display: block;"> Please enter credentials <br> <input type="text" id="mscolab_url" value="http://localhost:8083" placeholder="Mscolab URL"> <input type="text" id="mscolab_email" value="test@test" placeholder="Your Email"> <input type="text" id="mscolab_password" value="test" placeholder="Your Password"> <button id="mscolab_login">Login</button> </div> <div id="project_tab" class="tabcontent"> <div id="project_username"></div><br> <div id="project_list"></div><br> Waypoints<br> <ul id="waypoint_list"></ul> </div> </div>',
 /* CSS */
-'.onwindy-plugin-examples .left-border{left:300px}.onwindy-plugin-examples #search{display:none}#windy-plugin-examples{width:300px;height:100%;border-radius:8px}#windy-plugin-examples .section-title{text-align:center}#windy-plugin-examples #dragdemo-container{box-sizing:border-box;position:relative;border-radius:5px;border:1px solid blue;background-color:white;height:300px;margin:5px}#windy-plugin-examples #dragdemo-container .line{position:absolute;border:0px;background-color:black}#windy-plugin-examples #dragdemo-container #dragdemo-x{position:absolute;border:0px;background-color:black;left:30px;height:100%;width:.5px}#windy-plugin-examples #dragdemo-container #dragdemo-y{position:absolute;border:0px;background-color:black;top:30px;height:.5px;width:100%}#windy-plugin-examples #dragdemo-container #dragdemo-box{position:absolute;height:20px;width:20px;border-radius:10px;border:1px solid black;top:40px;left:40px}#windy-plugin-examples .dragdemo-description{border:1px solid blue;border-radius:5px;padding:10px;margin:5px}#windy-plugin-examples .dragdemo-description ul{margin-left:15px}#windy-plugin-examples .plugin-content{border-bottom-left-radius:8px;border-bottom-right-radius:8px}#device-mobile #open-in-app{display:none}#device-mobile .onwindy-plugin-examples #bottom{left:0px;z-index:20}#device-mobile #windy-plugin-examples{bottom:60px;height:auto;width:100%;transition:bottom .3s;z-index:10}#device-mobile #windy-plugin-examples .section-title{display:none}#device-mobile #windy-plugin-examples .calendar-backdrop{bottom:0px;height:40px;width:100%;position:absolute;overflow:hidden}#device-mobile #windy-plugin-examples .plugin-content{padding-bottom:40px}#device-mobile .mobile-calendar-expanded #windy-plugin-examples{bottom:100px}#device-tablet .onwindy-plugin-examples #bottom{margin-left:300px}#device-tablet #logo{left:100%;margin-left:150px}#device-tablet #open-in-app{display:none}',
+'.onwindy-plugin-examples .left-border{left:400px}.onwindy-plugin-examples #search{display:none}#windy-plugin-examples{width:400px;height:100%}#windy-plugin-examples .plugin-content{padding:20px 15px 15px 15px;font-size:14px;line-height:1.6;color:white;background:rgba(0,0,0,0.5)}.tab{overflow:hidden;border:1px solid #5c5c5c;background-color:#353535}.tab button{background-color:#3535356e;color:whitesmoke;float:left;border:none;outline:none;cursor:pointer;padding:14px 16px;transition:.3s;font-size:17px}.tab button:hover{background-color:#5c5c5c}.tab button.active{background-color:#707070}.tabcontent{display:none;padding:6px 12px;-webkit-animation:fadeEffect 1s;animation:fadeEffect 1s}.tabcontent::after{content:"";clear:both;display:block;float:none}@-webkit-keyframes fadeEffect{from{opacity:0}to{opacity:1}}@keyframes fadeEffect{from{opacity:0}to{opacity:1}}select{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#000;padding:0 1em 0 0;margin:0;width:100%;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}ul{list-style-type:none;margin:0;padding:0}li{color:whitesmoke;border-bottom:1px solid #5c5c5c;transition:font-size .3s ease,background-color .3s ease}li:last-child{border:none}li:hover{background:#5c5c5c}',
 /* Constructor */
 function () {
-  var _this = this;
+  var bcast = W.require('broadcast');
 
-  var Drag = W.require('Drag');
+  var map = W.require('map');
 
-  var rs = W.require('rootScope');
+  var websocket = null;
+  var token = null;
+  var projects = null;
+  var userId = null;
+  var msc_url = "http://localhost:8083";
+  var waypoints = [];
+  var markers = [];
+  var socket = null;
+  var icon = L.divIcon({
+    className: 'weather-at-city',
+    iconSize: [80, 40],
+    iconAnchor: [40, 20]
+  });
 
-  var $ = W.require('$');
+  function openTab(tabName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
 
-  this.lastOpened = true;
-  var bgVals = getComputedStyle($('.plugin-content', this.el)).backgroundColor.replace('rgb', 'rgba').match(/[\d\.]+/g);
-  if (bgVals.length == 3) bgVals.push(1);
-  $('.calendar-backdrop', this.el).style.backgroundImage = "linear-gradient(rgba(".concat(bgVals.slice(0, 3), ",0), rgba(").concat(bgVals, ") 60%)");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
 
-  if (rs.isMobile) {
-    this.addMobileSlider = true;
-    this.closeOnSwipeDown = false;
-    setTimeout(function () {
-      var bs = _this.bottomSlider;
-      bs.el.removeEventListener('mousedown', bs.bindedStart);
+    tablinks = document.getElementsByClassName("tablinks");
 
-      if (bs.supportTouch) {
-        bs.el.removeEventListener('touchstart', bs.bindedStart);
-      }
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
 
-      bs.bindedStart = Drag.startDrag.bind(bs);
-      bs.el.addEventListener('mousedown', bs.bindedStart);
-
-      if (bs.supportTouch) {
-        bs.el.addEventListener('touchstart', bs.bindedStart);
-      }
-
-      bs.origTopOfPlugin = _this.el.offsetTop;
-
-      bs.ondragstart = function () {
-        bs.startTop = _this.el.offsetTop;
-      };
-
-      bs.ondrag = function (x, y) {
-        var deltaY = y - bs.el.offsetTop;
-        _this.el.style.top = bs.startTop + deltaY + 'px';
-      };
-
-      bs.ondragend = function () {
-        if (Math.abs(_this.el.offsetTop < 20)) _this.el.style.top = bs.origTopOfPlugin + 'px';
-
-        if (_this.el.offsetHeight < 70) {
-          _this.close();
-
-          setTimeout(function () {
-            return _this.el.style.top = bs.origTopOfPlugin + 'px';
-          }, 500);
-        }
-      };
-    }, 0);
+    document.getElementById(tabName).style.display = "block";
+    document.getElementById(tabName.replace("tab", "link")).className += " active";
   }
 
-  this.onOtherPluginOpened = function (plugin) {
-    console.log("This ".concat(plugin, " has opened"));
+  function requestMsc() {
+    var endpoint = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+    var method = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "Get";
+    var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {
+      "token": token
+    };
+    var callback = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+    var url = msc_url + "/" + endpoint;
+    var request_data = {};
+
+    if (method == "Get") {
+      var start_char = "?";
+
+      for (var key in data) {
+        url += start_char + key + "=" + data[key];
+        start_char = "&";
+      }
+
+      request_data = {
+        method: method
+      };
+    } else {
+      var formdata = new FormData();
+
+      for (var key in data) {
+        formdata.append(key, data[key]);
+      }
+
+      request_data = {
+        method: method,
+        body: formdata
+      };
+    }
+
+    if (callback == null) {
+      return fetch(url, request_data).then(function (response) {
+        console.log(response);
+        return response.json();
+      });
+    } else {
+      fetch(url, request_data).then(function (response) {
+        console.log(response);
+        return response.json();
+      }).then(function (r_data) {
+        return callback(r_data);
+      });
+    }
+  }
+
+  function updateProject() {
+    var xmlEnd = "</ListOfWaypoints></FlightTrack>";
+    var xmlBegin = "<?xml version=\"1.0\" ?><FlightTrack version=\"4.0.4.\"><ListOfWaypoints>";
+    var xmlWaypoint = "<Waypoint flightlevel=\"ALTITUDE\" lat=\"LATITUDE\" location=\"LOCATION\" lon=\"LONGITUDE\"><Comments>COMMENT</Comments></Waypoint>";
+    var xmlWaypoints = [];
+
+    var _iterator = _createForOfIteratorHelper(waypoints),
+        _step;
+
+    try {
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        var waypoint = _step.value;
+        var lat = waypoint["lat"],
+            lon = waypoint["lon"],
+            alt = waypoint["alt"],
+            loc = waypoint["name"],
+            com = "";
+        xmlWaypoints.push(xmlWaypoint.replace("ALTITUDE", alt).replace("LATITUDE", lat).replace("LONGITUDE", lon).replace("COMMENT", com).replace("LOCATION", name));
+      }
+    } catch (err) {
+      _iterator.e(err);
+    } finally {
+      _iterator.f();
+    }
+
+    var file = xmlBegin + xmlWaypoints.join() + xmlEnd;
+    socket.emit("file-save", {
+      "token": token,
+      "p_id": parseInt(getSelectedProject()),
+      "content": file,
+      "comment": "Updated through Windy."
+    });
+  }
+
+  function projectUpdated(event) {
+    console.log(event);
+    event = JSON.parse(event);
+    var p_id = event["p_id"];
+    var u_id = event["u_id"];
+
+    if (p_id == getSelectedProject() && u_id != userId) {
+      console.log('Updating project ' + p_id);
+      projectSelected();
+    }
+  }
+
+  function moveWaypoint(event) {
+    if (waypoints.length > 0) {
+      var wp_index = event["target"]["options"]["title"] - 1;
+      var new_lat = event["target"]["_latlng"]["lat"];
+      var new_lon = event["target"]["_latlng"]["lng"];
+      console.log(wp_index, " was moved to ", new_lat, new_lon);
+      waypoints[wp_index]["lat"] = new_lat;
+      waypoints[wp_index]["lon"] = new_lon;
+      waypoints[wp_index]["name"] = "";
+      drawWaypoints();
+      updateProject();
+    }
+  }
+
+  function addWaypoint(event) {
+    if (waypoints.length > 0) {
+      var latlon = event.latlng;
+      console.log("New waypoint added at ", latlon);
+      waypoints.push({
+        "lat": latlon["lat"],
+        "lon": latlon["lng"],
+        "alt": 0,
+        "name": "",
+        "zoom": function zoom() {
+          return map.setView({
+            lat: latlon["lat"],
+            lng: latlon["lng"]
+          });
+        }
+      });
+      drawWaypoints();
+      updateProject();
+    }
+  }
+
+  function removeWaypoint(index) {
+    if (waypoints.length > 2) {
+      var latlon = event.latlng;
+      console.log("Waypoint ".concat(index, " removed"));
+      waypoints.splice(index, 1);
+      drawWaypoints();
+      updateProject();
+    }
+  }
+
+  function popupOpened(event) {
+    if (waypoints.length > 0) {
+      console.log(event);
+      var wp_index = parseInt(event["target"]["_popup"]["_content"].split(".")[0] - 1);
+
+      document.getElementById("WP_RM").onclick = function () {
+        return removeWaypoint(wp_index);
+      };
+    }
+  }
+
+  function drawWaypoints() {
+    if (markers) {
+      markers.forEach(function (m) {
+        return map.removeLayer(m);
+      });
+      markers = [];
+    }
+
+    var latlons = waypoints.map(function (x) {
+      return [x["lat"], x["lon"]];
+    });
+    var line = L.polyline(latlons, {
+      color: "rgb(20, 20, 140)",
+      weight: 4
+    }).addTo(map);
+    markers.push(line);
+    document.getElementById("waypoint_list").innerHTML = "";
+
+    for (var i = 0; i < waypoints.length; i++) {
+      var waypoint = waypoints[i];
+      document.getElementById("waypoint_list").innerHTML += "<li id=\"WP_".concat(i, "\">").concat(i + 1, ". (").concat(waypoint["lat"], ", ").concat(waypoint["lon"], ") ").concat(waypoint["name"], "</li>");
+      var marker = L.marker([waypoint["lat"], waypoint["lon"]], {
+        "draggable": true,
+        "title": i + 1
+      }).addTo(map);
+      marker.bindPopup("".concat(i + 1, ". ").concat(waypoint["name"], "<br><button id=\"WP_RM\">Remove</button>"));
+      marker.on("moveend", moveWaypoint);
+      markers.push(marker);
+    }
+
+    for (var i = 0; i < waypoints.length; i++) {
+      document.getElementById("WP_" + i).onclick = waypoints[i]["zoom"];
+    }
+  }
+
+  function projectSelected() {
+    var id = getSelectedProject();
+
+    function loadProject(response_data) {
+      var parser = new DOMParser();
+      var project = parser.parseFromString(response_data.content, "text/xml");
+      var xml_waypoints = project.getElementsByTagName("Waypoint");
+      waypoints = [];
+      var max_lat = -1000;
+      var min_lat = 1000;
+      var max_lon = -1000;
+      var min_lon = 1000;
+
+      var _iterator2 = _createForOfIteratorHelper(xml_waypoints),
+          _step2;
+
+      try {
+        var _loop = function _loop() {
+          waypoint = _step2.value;
+          var lat = waypoint.getAttribute("lat");
+          var lon = waypoint.getAttribute("lon");
+          var alt = waypoint.getAttribute("flightlevel");
+          var name = waypoint.getAttribute("location");
+          max_lat = max_lat < lat ? lat : max_lat;
+          max_lon = max_lon < lon ? lon : max_lon;
+          min_lat = min_lat > lat ? lat : min_lat;
+          min_lon = min_lon > lon ? lon : min_lon;
+          waypoints.push({
+            "lat": lat,
+            "lon": lon,
+            "alt": alt,
+            "name": name,
+            "zoom": function zoom() {
+              return map.setView({
+                lat: lat,
+                lng: lon
+              });
+            }
+          });
+        };
+
+        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+          var waypoint;
+
+          _loop();
+        }
+      } catch (err) {
+        _iterator2.e(err);
+      } finally {
+        _iterator2.f();
+      }
+
+      var southWest = L.latLng(min_lat, min_lon),
+          northEast = L.latLng(max_lat, max_lon),
+          bounds = L.latLngBounds(southWest, northEast);
+      map.fitBounds(bounds);
+      drawWaypoints();
+    }
+
+    var data = {
+      "token": token,
+      "p_id": id
+    };
+    requestMsc("get_project_by_id", "Get", data, loadProject);
+  }
+
+  function getSelectedProject() {
+    return document.getElementById("selected_project").value;
+  }
+
+  function postLogin(response_data) {
+    token = response_data["token"];
+    var data = {
+      "token": token
+    };
+    var username = response_data["user"]["username"];
+    userId = response_data["user"]["id"];
+    var test = document.getElementById("project_username");
+    test.innerHTML = "Logged in as " + username;
+    socket = io.connect(msc_url);
+    socket.on('connect', function () {
+      console.log('Client has connected to the server!');
+      socket.emit("start", data);
+    });
+    socket.on('file-changed', projectUpdated);
+    socket.on('disconnect', function () {
+      console.log('The client has disconnected!');
+      socket.disconnect();
+      openTab("login_tab");
+    });
+    openTab("project_tab");
+
+    function listProjects(response_data) {
+      projects = response_data["projects"];
+      document.getElementById("project_list").innerHTML = "Projects: <select name=\"projects\" id=\"selected_project\"></select>";
+
+      for (var project_index in projects) {
+        var project = projects[project_index];
+        document.getElementById("selected_project").innerHTML += "<option value=\"".concat(project['p_id'], "\">").concat(project["path"], "</option>");
+      }
+
+      document.getElementById("selected_project").onchange = projectSelected;
+    }
+
+    requestMsc("projects", "Get", data, listProjects);
+  }
+
+  function loginMsc() {
+    msc_url = document.getElementById("mscolab_url").value;
+    var email = document.getElementById("mscolab_email").value;
+    var password = document.getElementById("mscolab_password").value;
+    var data = {
+      "password": password,
+      "email": email
+    };
+    requestMsc("token", "Post", data, postLogin);
+  }
+
+  console.log('I am mounted to the page');
+  console.log(loginMsc);
+  document.getElementById("mscolab_login").onclick = loginMsc;
+
+  document.getElementById("login_link").onclick = function () {
+    return openTab("login_tab");
   };
 
-  var dragDiv = Object.assign({
-    el: $('#dragdemo-box'),
-    ondrag: function ondrag(x, y) {
-      x = x < 0 ? 0 : x > $('#dragdemo-container').offsetWidth - 22 ? $('#dragdemo-container').offsetWidth - 22 : x;
-      y = y < 0 ? 0 : y > $('#dragdemo-container').offsetHeight - 22 ? $('#dragdemo-container').offsetHeight - 22 : y;
-      this.el.style.left = x + 'px';
-      this.el.style.top = y + 'px';
-    },
-    ondragstart: function ondragstart(xy) {},
-    ondragend: function ondragend(e) {
-      console.log('Do something with event:', e);
-    }
-  }, Drag);
+  document.getElementById("project_link").onclick = function () {
+    return openTab("project_tab");
+  };
 
-  dragDiv._init();
+  map.on("click", addWaypoint);
+  map.on("popupopen", popupOpened);
 
-  $('#dragdemo-box').addEventListener('touchstart', function (e) {
-    return e.stopPropagation();
-  });
-  $('#dragdemo-box').addEventListener('mousedown', function (e) {
-    return e.stopPropagation();
-  });
-  var dragContainer = Object.assign({
-    el: $('#dragdemo-container'),
-    ondrag: function ondrag(x, y) {
-      $('#dragdemo-x').style.left = x + this.startLeft - this.el.style.left.slice(0, -2) - 1.5 + 'px';
-      $('#dragdemo-y').style.top = y + this.startTop - this.el.style.top.slice(0, -2) - 1.5 + 'px';
-    },
-    ondragstart: function ondragstart(xy) {
-      var clientRect = this.el.getBoundingClientRect();
-      this.startLeft = xy[0] - clientRect.left - this.el.offsetLeft;
-      this.startTop = xy[1] - clientRect.top - this.el.offsetTop;
-      this.ondrag(this.el.offsetLeft, this.el.offsetTop);
-    },
-    ondragend: function ondragend(e) {
-      console.log('Do something with event:', e);
-    }
-  }, Drag);
-
-  dragContainer._init();
+  this.onclose = function () {
+    return console.log('I am being closed');
+  };
 });
