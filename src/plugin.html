@@ -89,9 +89,45 @@
             }
         }
 
+        function moveWaypoint(event){
+            if(waypoints.length > 0){
+                const wp_index = event["target"]["options"]["title"] - 1;
+                const new_lat = event["target"]["_latlng"]["lat"];
+                const new_lon = event["target"]["_latlng"]["lng"];
+                console.log(wp_index, " was moved to ", new_lat, new_lon);
+                waypoints[wp_index]["lat"] = new_lat;
+                waypoints[wp_index]["lon"] = new_lon;
+                waypoints[wp_index]["name"] = "";
+                drawWaypoints();
+            }
+        }
+
         function addWaypoint(event){
-            const latlon = event.latlng;
-            console.log(latlon);
+            if(waypoints.length > 0){
+                const latlon = event.latlng;
+                console.log("New waypoint added at ", latlon);
+                waypoints.push({"lat": latlon["lat"], "lon": latlon["lng"], "alt": 0, "name": "", "zoom": () => 
+                    map.setView({lat: latlon["lat"], lng: latlon["lng"]})
+                });
+                drawWaypoints();
+            }
+        }
+
+        function removeWaypoint(index){
+            if(waypoints.length > 0){
+                const latlon = event.latlng;
+                console.log(`Waypoint ${index} removed`);
+                waypoints.splice(index, 1);
+                drawWaypoints();
+            }
+        }
+
+        function popupOpened(event){
+            if(waypoints.length > 0){
+                console.log(event);
+                const wp_index = parseInt(event["target"]["_popup"]["_content"].split(".")[0] - 1);
+                document.getElementById("WP_RM").onclick = () => removeWaypoint(wp_index);
+            }
         }
 
         function drawWaypoints(){
@@ -110,8 +146,9 @@
             for(var i = 0; i < waypoints.length; i++){
                 const waypoint = waypoints[i];
                 document.getElementById("waypoint_list").innerHTML += `<li id="WP_${i}">${i + 1}. (${waypoint["lat"]}, ${waypoint["lon"]}) ${waypoint["name"]}</li>`;
-                const marker = L.marker([waypoint["lat"], waypoint["lon"]]).addTo(map);
-                marker.bindPopup(waypoint["name"]);
+                const marker = L.marker([waypoint["lat"], waypoint["lon"]], {"draggable": true, "title": i + 1}).addTo(map);
+                marker.bindPopup(`${i + 1}. ${waypoint["name"]}<br><button id="WP_RM">Remove</button>`);
+                marker.on("moveend", moveWaypoint);
                 markers.push(marker);
             }
             for(var i = 0; i < waypoints.length; i++){
@@ -207,6 +244,7 @@
         document.getElementById("login_link").onclick = () => openTab("login_tab");
         document.getElementById("project_link").onclick = () => openTab("project_tab");
         map.on("click", addWaypoint);
+        map.on("popupopen", popupOpened);
 
         this.onclose = () => console.log('I am being closed');
     </script>
