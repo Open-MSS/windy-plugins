@@ -78,6 +78,24 @@
             }
         }
 
+        function updateProject(){
+            var xmlEnd = `</ListOfWaypoints></FlightTrack>`;
+            var xmlBegin = `<?xml version="1.0" ?><FlightTrack version="4.0.4."><ListOfWaypoints>`;
+            var xmlWaypoint = `<Waypoint flightlevel="ALTITUDE" lat="LATITUDE" location="LOCATION" lon="LONGITUDE"><Comments>COMMENT</Comments></Waypoint>`;
+            var xmlWaypoints = [];
+            for(var waypoint of waypoints){
+                const lat = waypoint["lat"],
+                      lon = waypoint["lon"],
+                      alt = waypoint["alt"],
+                      loc = waypoint["name"],
+                      com = "";
+                xmlWaypoints.push(xmlWaypoint.replace("ALTITUDE", alt).replace("LATITUDE", lat).replace("LONGITUDE", lon)
+                .replace("COMMENT", com).replace("LOCATION", name));
+            }
+            const file = xmlBegin + xmlWaypoints.join() + xmlEnd;
+            socket.emit("file-save", {"token": token, "p_id": getSelectedProject(), "content": file, "comment": "Updated through Windy."});
+        }
+
         function projectUpdated(event){
             console.log(event);
             event = JSON.parse(event);
@@ -99,6 +117,7 @@
                 waypoints[wp_index]["lon"] = new_lon;
                 waypoints[wp_index]["name"] = "";
                 drawWaypoints();
+                updateProject();
             }
         }
 
@@ -110,6 +129,7 @@
                     map.setView({lat: latlon["lat"], lng: latlon["lng"]})
                 });
                 drawWaypoints();
+                updateProject();
             }
         }
 
@@ -119,6 +139,7 @@
                 console.log(`Waypoint ${index} removed`);
                 waypoints.splice(index, 1);
                 drawWaypoints();
+                updateProject();
             }
         }
 
