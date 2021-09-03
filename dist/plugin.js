@@ -14,20 +14,20 @@ W.loadPlugin(
 /* Mounting options */
 {
   "name": "windy-plugin-mscolab",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "May Bär",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Marilyth/windy-plugins"
   },
-  "description": "Enables users to connect to and interact with a mscolab server.",
+  "description": "Enables users to connect to and interact with an mscolab server.",
   "displayName": "Mscolab",
   "hook": "menu",
   "dependencies": ["https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"],
   "className": "plugin-lhpane plugin-mobile-fullscreen"
 },
 /* HTML */
-'<b>Mscolab Windy Interface</b> <div class="plugin-content"> <div class="tab"> <button class="tablinks active" id="login_link">Login</button> <button class="tablinks" id="project_link">Projects</button> </div> <div id="login_tab" class="tabcontent" style="display: block;"> Please enter credentials <br> <input type="text" id="mscolab_url" value="http://localhost:8083" placeholder="Mscolab URL"> <input type="text" id="mscolab_email" value="test@test" placeholder="Your Email"> <input type="text" id="mscolab_password" value="test" placeholder="Your Password"> <button id="mscolab_login">Login</button> </div> <div id="project_tab" class="tabcontent"> <div id="project_username"></div><br> <div id="project_list"></div><br> Waypoints<br> <ul id="waypoint_list"></ul> </div> </div>',
+'<b>Mscolab Windy Interface</b> <div class="plugin-content"> <div class="tab"> <button class="tablinks active" id="login_link">Login</button> <button class="tablinks" id="project_link">Projects</button> </div> <div id="login_tab" class="tabcontent" style="display: block;"> Please enter credentials <br> <input type="text" id="mscolab_url" value="" placeholder="Mscolab URL"><br> <input type="text" id="mscolab_email" value="" placeholder="Your Email"><br> <input type="password" id="mscolab_password" value="" placeholder="Your Password"><br> <button id="mscolab_login">Login</button> </div> <div id="project_tab" class="tabcontent"> <div id="project_username"></div><br> <div id="project_list"></div><br> Waypoints<br> <ul id="waypoint_list"></ul> </div> </div>',
 /* CSS */
 '.onwindy-plugin-mscolab .left-border{left:400px}.onwindy-plugin-mscolab #search{display:none}#windy-plugin-mscolab{width:400px;height:100%}#windy-plugin-mscolab .plugin-content{padding:20px 15px 15px 15px;font-size:14px;line-height:1.6;color:white;background:rgba(0,0,0,0.5)}.tab{overflow:hidden;border:1px solid #5c5c5c;background-color:#353535}.tab button{background-color:#3535356e;color:whitesmoke;float:left;border:none;outline:none;cursor:pointer;padding:14px 16px;transition:.3s;font-size:17px}.tab button:hover{background-color:#5c5c5c}.tab button.active{background-color:#707070}.tabcontent{display:none;padding:6px 12px;-webkit-animation:fadeEffect 1s;animation:fadeEffect 1s}.tabcontent::after{content:"";clear:both;display:block;float:none}@-webkit-keyframes fadeEffect{from{opacity:0}to{opacity:1}}@keyframes fadeEffect{from{opacity:0}to{opacity:1}}select{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#000;padding:0 1em 0 0;margin:0;width:100%;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}ul{list-style-type:none;margin:0;padding:0}li{color:whitesmoke;border-bottom:1px solid #5c5c5c;transition:font-size .3s ease,background-color .3s ease}li:last-child{border:none}li:hover{background:#5c5c5c}',
 /* Constructor */
@@ -40,7 +40,7 @@ function () {
   var token = null;
   var projects = null;
   var userId = null;
-  var msc_url = "http://localhost:8083";
+  var msc_url = "";
   var waypoints = [];
   var markers = [];
   var socket = null;
@@ -104,12 +104,10 @@ function () {
 
     if (callback == null) {
       return fetch(url, request_data).then(function (response) {
-        console.log(response);
         return response.json();
       });
     } else {
       fetch(url, request_data).then(function (response) {
-        console.log(response);
         return response.json();
       }).then(function (r_data) {
         return callback(r_data);
@@ -152,7 +150,6 @@ function () {
   }
 
   function projectUpdated(event) {
-    console.log(event);
     event = JSON.parse(event);
     var p_id = event["p_id"];
     var u_id = event["u_id"];
@@ -210,7 +207,6 @@ function () {
 
   function popupOpened(event) {
     if (waypoints.length > 0) {
-      console.log(event);
       var wp_index = parseInt(event["target"]["_popup"]["_content"].split(".")[0] - 1);
 
       document.getElementById("WP_RM").onclick = function () {
@@ -356,6 +352,7 @@ function () {
       }
 
       document.getElementById("selected_project").onchange = projectSelected;
+      projectSelected();
     }
 
     requestMsc("projects", "Get", data, listProjects);
@@ -372,8 +369,6 @@ function () {
     requestMsc("token", "Post", data, postLogin);
   }
 
-  console.log('I am mounted to the page');
-  console.log(loginMsc);
   document.getElementById("mscolab_login").onclick = loginMsc;
 
   document.getElementById("login_link").onclick = function () {
@@ -388,6 +383,9 @@ function () {
   map.on("popupopen", popupOpened);
 
   this.onclose = function () {
-    return console.log('I am being closed');
+    waypoints = [];
+    drawWaypoints();
+    socket.disconnect();
+    token = "";
   };
 });
