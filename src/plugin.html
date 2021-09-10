@@ -11,7 +11,13 @@
             <input type="text" id="mscolab_url" value="" placeholder="Mscolab URL"><br>
             <input type="text" id="mscolab_email" value="" placeholder="Your Email"><br>
             <input type="password" id="mscolab_password" value="" placeholder="Your Password"><br>
-            <button id="mscolab_login">Login</button>
+            <button id="mscolab_login">Login</button><br>
+            <div id="status"></div>
+            <div id="http-auth" style="display: none;">
+                The server requested additional http authentication<br>
+                <input type="text" id="mscolab_http_user" value="" placeholder="HTTP Auth Username"><br>
+                <input type="password" id="mscolab_http_password" value="" placeholder="HTTP Auth Password">
+            </div>
         </div>
 
         <div id="project_tab" class="tabcontent">
@@ -55,6 +61,12 @@
         }
 
         function requestMsc(endpoint="", method="Get", data={"token": token}, callback=null){
+            document.getElementById("status").innerHTML = "";
+            document.getElementById("http-auth").style.display = "none";
+            var httpUser = document.getElementById("mscolab_http_user").value;
+            var httpPass = document.getElementById("mscolab_http_password").value;
+            var headers = new Headers();
+            headers.set("Authorization", "Basic " + btoa(httpUser + ":" + httpPass));
             var url = msc_url + "/" + endpoint;
             var request_data = {}
             if(method == "Get"){
@@ -63,18 +75,20 @@
                     url += start_char + key + "=" + data[key];
                     start_char = "&";
                 }
-                request_data = {method: method}
+                request_data = {method: method, headers: headers};
             } else {
                 var formdata = new FormData();
                 for (var key in data) {
                     formdata.append(key, data[key]);
                 }
-                request_data = {method: method, body: formdata}
+                request_data = {method: method, body: formdata, headers: headers};
             }
             if(callback == null){
-                return fetch(url, request_data).then(response => {return response.json();});
+                return fetch(url, request_data).then(response => {return response;});
             } else {
-                fetch(url, request_data).then(response => {return response.json();}).then(r_data => callback(r_data));
+                fetch(url, request_data).then(response => {if(response.ok) return response.json(); else throw Error(response.statusText)}).then(r_data => callback(r_data))
+                                        .catch(error => {console.log(error); document.getElementById("status").innerHTML = error.toString().fontcolor("red");
+                                                         if(error.toString().toLowerCase().includes("unauthorized")) document.getElementById("http-auth").style.display = "block";});
             }
         }
 
@@ -251,7 +265,10 @@
         }
 
         function loginMsc(){
-            msc_url = document.getElementById("mscolab_url").value;
+            // Can't fetch http on windy, only https
+            msc_url = document.getElementById("mscolab_url").value
+            msc_url = msc_url.includes("localhost") || msc_url.includes("127.0.0.1") ? msc_url : msc_url.replace("http://", "https://");
+
             var email = document.getElementById("mscolab_email").value;
             var password = document.getElementById("mscolab_password").value;
             var data = {"password": password, "email": email};
