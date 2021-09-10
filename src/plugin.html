@@ -278,6 +278,19 @@
         document.getElementById("mscolab_login").onclick = loginMsc;
         document.getElementById("login_link").onclick = () => openTab("login_tab");
         document.getElementById("project_link").onclick = () => openTab("project_tab");
+
+        // Disable Windy shortcuts while inputting information
+        document.getElementById("mscolab_email").addEventListener("keyup", (e) => e.stopPropagation(), false);
+        document.getElementById("mscolab_email").addEventListener("keydown", (e) => e.stopPropagation(), false);
+        document.getElementById("mscolab_password").addEventListener("keyup", (e) => e.stopPropagation(), false);
+        document.getElementById("mscolab_password").addEventListener("keydown", (e) => e.stopPropagation(), false);
+        document.getElementById("mscolab_url").addEventListener("keyup", (e) => e.stopPropagation(), false);
+        document.getElementById("mscolab_url").addEventListener("keydown", (e) => e.stopPropagation(), false);
+        document.getElementById("mscolab_http_user").addEventListener("keyup", (e) => e.stopPropagation(), false);
+        document.getElementById("mscolab_http_user").addEventListener("keydown", (e) => e.stopPropagation(), false);
+        document.getElementById("mscolab_http_password").addEventListener("keydown", (e) => e.stopPropagation(), false);
+        document.getElementById("mscolab_http_password").addEventListener("keydown", (e) => e.stopPropagation(), false);
+
         map.on("click", addWaypoint);
         map.on("popupopen", popupOpened);
 

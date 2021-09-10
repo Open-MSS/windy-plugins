@@ -392,6 +392,36 @@ function () {
     return openTab("project_tab");
   };
 
+  document.getElementById("mscolab_email").addEventListener("keyup", function (e) {
+    return e.stopPropagation();
+  }, false);
+  document.getElementById("mscolab_email").addEventListener("keydown", function (e) {
+    return e.stopPropagation();
+  }, false);
+  document.getElementById("mscolab_password").addEventListener("keyup", function (e) {
+    return e.stopPropagation();
+  }, false);
+  document.getElementById("mscolab_password").addEventListener("keydown", function (e) {
+    return e.stopPropagation();
+  }, false);
+  document.getElementById("mscolab_url").addEventListener("keyup", function (e) {
+    return e.stopPropagation();
+  }, false);
+  document.getElementById("mscolab_url").addEventListener("keydown", function (e) {
+    return e.stopPropagation();
+  }, false);
+  document.getElementById("mscolab_http_user").addEventListener("keyup", function (e) {
+    return e.stopPropagation();
+  }, false);
+  document.getElementById("mscolab_http_user").addEventListener("keydown", function (e) {
+    return e.stopPropagation();
+  }, false);
+  document.getElementById("mscolab_http_password").addEventListener("keydown", function (e) {
+    return e.stopPropagation();
+  }, false);
+  document.getElementById("mscolab_http_password").addEventListener("keydown", function (e) {
+    return e.stopPropagation();
+  }, false);
   map.on("click", addWaypoint);
   map.on("popupopen", popupOpened);
 
