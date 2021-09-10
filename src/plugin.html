@@ -4,6 +4,7 @@
         <div class="tab">
             <button class="tablinks active" id="login_link">Login</button>
             <button class="tablinks" id="project_link">Projects</button>
+            <button class="tablinks" id="chat_link">Chat</button>
           </div>
         <div id="login_tab" class="tabcontent" style="display: block;">
             Please enter credentials <br>
@@ -25,6 +26,12 @@
             <div id="project_list"></div><br>
             Waypoints<br>
             <ul id="waypoint_list"></ul>
+        </div>
+
+        <div id="chat_tab" class="tabcontent">
+            <ul id="chat_list"></ul>
+            <textarea id="chat_message" value="" placeholder="Enter a message..."></textarea><br>
+            <button id="chat_send">Send</button><br>
         </div>
     </div>
     <script>
@@ -156,6 +163,19 @@
             }
         }
 
+        function sendMessage(){
+            var message = document.getElementById("chat_message").value;
+            if(message.length > 0){
+                socket.emit("chat-message", {"token": token, "p_id": parseInt(getSelectedProject()), "message_text": message, "reply_id": -1});
+                document.getElementById("chat_message").value = "";
+            }
+        }
+
+        function messageReceived(event){
+            var message = JSON.parse(event);
+            document.getElementById("chat_list").innerHTML += `<li id="Chat_${message.id}"><${message.time}> ${message.username} said:<br>${message.text}</li>`;
+        }
+
         function popupOpened(event){
             if(waypoints.length > 0){
                 const wp_index = parseInt(event["target"]["_popup"]["_content"].split(".")[0] - 1);
@@ -221,10 +241,23 @@
 
             var data = {"token": token, "p_id": id};
             requestMsc("get_project_by_id", "Get", data, loadProject);
+            loadChat();
         }
 
         function getSelectedProject(){
             return document.getElementById("selected_project").value;
+        }
+
+        function loadChat(){
+            document.getElementById("chat_list").innerHTML = "";
+            function onLoaded(response){
+                for(var i = 0; i < response.messages.length; i++){
+                    var message = response.messages[i];
+                    document.getElementById("chat_list").innerHTML += `<li id="Chat_${message.id}"><${message.time}> ${message.username} said:<br>${message.text}</li>`;
+                }
+            }
+            var data = {"token": token, "p_id": getSelectedProject()};
+            requestMsc("messages", "Get", data, onLoaded);
         }
 
         function postLogin(response_data){
@@ -242,6 +275,7 @@
             });
             // Add a connect listener
             socket.on('file-changed', projectUpdated);
+            socket.on('chat-message-client', messageReceived);
             // Add a disconnect listener
             socket.on('disconnect',function() {
                 console.log('The client has disconnected!');
@@ -276,8 +310,10 @@
         }
 
         document.getElementById("mscolab_login").onclick = loginMsc;
+        document.getElementById("chat_send").onclick = sendMessage;
         document.getElementById("login_link").onclick = () => openTab("login_tab");
         document.getElementById("project_link").onclick = () => openTab("project_tab");
+        document.getElementById("chat_link").onclick = () => openTab("chat_tab");
 
         // Disable Windy shortcuts while inputting information
         document.getElementById("mscolab_email").addEventListener("keyup", (e) => e.stopPropagation(), false);
@@ -288,8 +324,10 @@
         document.getElementById("mscolab_url").addEventListener("keydown", (e) => e.stopPropagation(), false);
         document.getElementById("mscolab_http_user").addEventListener("keyup", (e) => e.stopPropagation(), false);
         document.getElementById("mscolab_http_user").addEventListener("keydown", (e) => e.stopPropagation(), false);
+        document.getElementById("mscolab_http_password").addEventListener("keyup", (e) => e.stopPropagation(), false);
         document.getElementById("mscolab_http_password").addEventListener("keydown", (e) => e.stopPropagation(), false);
-        document.getElementById("mscolab_http_password").addEventListener("keydown", (e) => e.stopPropagation(), false);
+        document.getElementById("chat_message").addEventListener("keyup", (e) => e.stopPropagation(), false);
+        document.getElementById("chat_message").addEventListener("keydown", (e) => e.stopPropagation(), false);
 
         map.on("click", addWaypoint);
         map.on("popupopen", popupOpened);

@@ -14,7 +14,7 @@ W.loadPlugin(
 /* Mounting options */
 {
   "name": "windy-plugin-mscolab",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "author": "May Bär",
   "repository": {
     "type": "git",
@@ -27,7 +27,7 @@ W.loadPlugin(
   "className": "plugin-lhpane plugin-mobile-fullscreen"
 },
 /* HTML */
-'<b>Mscolab Windy Interface</b> <div class="plugin-content"> <div class="tab"> <button class="tablinks active" id="login_link">Login</button> <button class="tablinks" id="project_link">Projects</button> </div> <div id="login_tab" class="tabcontent" style="display: block;"> Please enter credentials <br> <input type="text" id="mscolab_url" value="" placeholder="Mscolab URL"><br> <input type="text" id="mscolab_email" value="" placeholder="Your Email"><br> <input type="password" id="mscolab_password" value="" placeholder="Your Password"><br> <button id="mscolab_login">Login</button><br> <div id="status"></div> <div id="http-auth" style="display: none;"> The server requested additional http authentication<br> <input type="text" id="mscolab_http_user" value="" placeholder="HTTP Auth Username"><br> <input type="password" id="mscolab_http_password" value="" placeholder="HTTP Auth Password"> </div> </div> <div id="project_tab" class="tabcontent"> <div id="project_username"></div><br> <div id="project_list"></div><br> Waypoints<br> <ul id="waypoint_list"></ul> </div> </div>',
+'<b>Mscolab Windy Interface</b> <div class="plugin-content"> <div class="tab"> <button class="tablinks active" id="login_link">Login</button> <button class="tablinks" id="project_link">Projects</button> <button class="tablinks" id="chat_link">Chat</button> </div> <div id="login_tab" class="tabcontent" style="display: block;"> Please enter credentials <br> <input type="text" id="mscolab_url" value="" placeholder="Mscolab URL"><br> <input type="text" id="mscolab_email" value="" placeholder="Your Email"><br> <input type="password" id="mscolab_password" value="" placeholder="Your Password"><br> <button id="mscolab_login">Login</button><br> <div id="status"></div> <div id="http-auth" style="display: none;"> The server requested additional http authentication<br> <input type="text" id="mscolab_http_user" value="" placeholder="HTTP Auth Username"><br> <input type="password" id="mscolab_http_password" value="" placeholder="HTTP Auth Password"> </div> </div> <div id="project_tab" class="tabcontent"> <div id="project_username"></div><br> <div id="project_list"></div><br> Waypoints<br> <ul id="waypoint_list"></ul> </div> <div id="chat_tab" class="tabcontent"> <ul id="chat_list"></ul> <textarea id="chat_message" value="" placeholder="Enter a message..."></textarea><br> <button id="chat_send">Send</button><br> </div> </div>',
 /* CSS */
 '.onwindy-plugin-mscolab .left-border{left:400px}.onwindy-plugin-mscolab #search{display:none}#windy-plugin-mscolab{width:400px;height:100%}#windy-plugin-mscolab .plugin-content{padding:20px 15px 15px 15px;font-size:14px;line-height:1.6;color:white;background:rgba(0,0,0,0.5)}.tab{overflow:hidden;border:1px solid #5c5c5c;background-color:#353535}.tab button{background-color:#3535356e;color:whitesmoke;float:left;border:none;outline:none;cursor:pointer;padding:14px 16px;transition:.3s;font-size:17px}.tab button:hover{background-color:#5c5c5c}.tab button.active{background-color:#707070}.tabcontent{display:none;padding:6px 12px;-webkit-animation:fadeEffect 1s;animation:fadeEffect 1s}.tabcontent::after{content:"";clear:both;display:block;float:none}@-webkit-keyframes fadeEffect{from{opacity:0}to{opacity:1}}@keyframes fadeEffect{from{opacity:0}to{opacity:1}}select{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#000;padding:0 1em 0 0;margin:0;width:100%;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}ul{list-style-type:none;margin:0;padding:0}li{color:whitesmoke;border-bottom:1px solid #5c5c5c;transition:font-size .3s ease,background-color .3s ease}li:last-child{border:none}li:hover{background:#5c5c5c}',
 /* Constructor */
@@ -217,6 +217,25 @@ function () {
     }
   }
 
+  function sendMessage() {
+    var message = document.getElementById("chat_message").value;
+
+    if (message.length > 0) {
+      socket.emit("chat-message", {
+        "token": token,
+        "p_id": parseInt(getSelectedProject()),
+        "message_text": message,
+        "reply_id": -1
+      });
+      document.getElementById("chat_message").value = "";
+    }
+  }
+
+  function messageReceived(event) {
+    var message = JSON.parse(event);
+    document.getElementById("chat_list").innerHTML += "<li id=\"Chat_".concat(message.id, "\"><").concat(message.time, "> ").concat(message.username, " said:<br>").concat(message.text, "</li>");
+  }
+
   function popupOpened(event) {
     if (waypoints.length > 0) {
       var wp_index = parseInt(event["target"]["_popup"]["_content"].split(".")[0] - 1);
@@ -326,10 +345,28 @@ function () {
       "p_id": id
     };
     requestMsc("get_project_by_id", "Get", data, loadProject);
+    loadChat();
   }
 
   function getSelectedProject() {
     return document.getElementById("selected_project").value;
+  }
+
+  function loadChat() {
+    document.getElementById("chat_list").innerHTML = "";
+
+    function onLoaded(response) {
+      for (var i = 0; i < response.messages.length; i++) {
+        var message = response.messages[i];
+        document.getElementById("chat_list").innerHTML += "<li id=\"Chat_".concat(message.id, "\"><").concat(message.time, "> ").concat(message.username, " said:<br>").concat(message.text, "</li>");
+      }
+    }
+
+    var data = {
+      "token": token,
+      "p_id": getSelectedProject()
+    };
+    requestMsc("messages", "Get", data, onLoaded);
   }
 
   function postLogin(response_data) {
@@ -347,6 +384,7 @@ function () {
       socket.emit("start", data);
     });
     socket.on('file-changed', projectUpdated);
+    socket.on('chat-message-client', messageReceived);
     socket.on('disconnect', function () {
       console.log('The client has disconnected!');
       socket.disconnect();
@@ -383,6 +421,7 @@ function () {
   }
 
   document.getElementById("mscolab_login").onclick = loginMsc;
+  document.getElementById("chat_send").onclick = sendMessage;
 
   document.getElementById("login_link").onclick = function () {
     return openTab("login_tab");
@@ -390,6 +429,10 @@ function () {
 
   document.getElementById("project_link").onclick = function () {
     return openTab("project_tab");
+  };
+
+  document.getElementById("chat_link").onclick = function () {
+    return openTab("chat_tab");
   };
 
   document.getElementById("mscolab_email").addEventListener("keyup", function (e) {
@@ -416,10 +459,16 @@ function () {
   document.getElementById("mscolab_http_user").addEventListener("keydown", function (e) {
     return e.stopPropagation();
   }, false);
-  document.getElementById("mscolab_http_password").addEventListener("keydown", function (e) {
+  document.getElementById("mscolab_http_password").addEventListener("keyup", function (e) {
     return e.stopPropagation();
   }, false);
   document.getElementById("mscolab_http_password").addEventListener("keydown", function (e) {
+    return e.stopPropagation();
+  }, false);
+  document.getElementById("chat_message").addEventListener("keyup", function (e) {
+    return e.stopPropagation();
+  }, false);
+  document.getElementById("chat_message").addEventListener("keydown", function (e) {
     return e.stopPropagation();
   }, false);
   map.on("click", addWaypoint);
