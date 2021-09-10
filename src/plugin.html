@@ -24,6 +24,11 @@
         <div id="project_tab" class="tabcontent">
             <div id="project_username"></div><br>
             <div id="project_list"></div><br>
+            <div id="project_create" style="display: none;">
+                <input type="text" id="project_create_path" value="" placeholder="Project Path"><br>
+                <textarea id="project_create_description" value="" placeholder="Project Description"></textarea><br>
+                <button id="project_create_ok">Create</button>
+            </div>
             Waypoints<br>
             <ul id="waypoint_list"></ul>
         </div>
@@ -37,7 +42,6 @@
     <script>
         import map from '@windy/map';
         import bcast from '@windy/broadcast';
-        var websocket = null;
         var token = null;
         var projects = null;
         var userId = null;
@@ -93,7 +97,12 @@
             if(callback == null){
                 return fetch(url, request_data).then(response => {return response;});
             } else {
-                fetch(url, request_data).then(response => {if(response.ok) return response.json(); else throw Error(response.statusText)}).then(r_data => callback(r_data))
+                fetch(url, request_data).then(response => {if(response.ok) return response.text(); else throw Error(response.statusText)})
+                                        .then(text => {var data = ""; try{
+                                                                        data = JSON.parse(text);
+                                                                      } catch(e) {
+                                                                        data = text;
+                                                                      } callback(data);})
                                         .catch(error => {console.log(error); document.getElementById("status").innerHTML = error.toString().fontcolor("red");
                                                          if(error.toString().toLowerCase().includes("unauthorized")) document.getElementById("http-auth").style.display = "block";});
             }
@@ -176,6 +185,16 @@
             document.getElementById("chat_list").innerHTML += `<li id="Chat_${message.id}"><${message.time}> ${message.username} said:<br>${message.text}</li>`;
         }
 
+        function createProject(){
+            var path = document.getElementById("project_create_path").value;
+            var description = document.getElementById("project_create_description").value;
+            var data = {"token": token, "path": path, "description": description};
+
+            if(path.length > 0){
+                requestMsc("create_project", "Post", data, listProjects);
+            }
+        }
+
         function popupOpened(event){
             if(waypoints.length > 0){
                 const wp_index = parseInt(event["target"]["_popup"]["_content"].split(".")[0] - 1);
@@ -238,10 +257,14 @@
                 map.fitBounds(bounds);
                 drawWaypoints();
             }
-
-            var data = {"token": token, "p_id": id};
-            requestMsc("get_project_by_id", "Get", data, loadProject);
-            loadChat();
+            if(id > -1){
+                document.getElementById("project_create").style.display = "none";
+                var data = {"token": token, "p_id": id};
+                requestMsc("get_project_by_id", "Get", data, loadProject);
+                loadChat();
+            } else {
+                document.getElementById("project_create").style.display = "block";
+            }
         }
 
         function getSelectedProject(){
@@ -258,6 +281,26 @@
             }
             var data = {"token": token, "p_id": getSelectedProject()};
             requestMsc("messages", "Get", data, onLoaded);
+        }
+
+        function listProjects(){
+            document.getElementById("project_create_path").value = "";
+            document.getElementById("project_create_description").value = "";
+
+            function onLoad(response_data){
+                projects = response_data["projects"];
+                document.getElementById("project_list").innerHTML = `Projects: <select name="projects" id="selected_project"></select>`;
+                for(var project_index in projects){
+                    var project = projects[project_index];
+                    document.getElementById("selected_project").innerHTML += `<option value="${project['p_id']}">${project["path"]}</option>`;
+                }
+                document.getElementById("selected_project").innerHTML += `<option value="-1">Create New Project</option>`;
+                document.getElementById("selected_project").onchange = projectSelected;
+                projectSelected();
+            }
+
+            var data = {"token": token};
+            requestMsc("projects", "Get", data, onLoad);
         }
 
         function postLogin(response_data){
@@ -284,18 +327,7 @@
             });
 
             openTab("project_tab")
-
-            function listProjects(response_data){
-                projects = response_data["projects"];
-                document.getElementById("project_list").innerHTML = `Projects: <select name="projects" id="selected_project"></select>`;
-                for(var project_index in projects){
-                    var project = projects[project_index];
-                    document.getElementById("selected_project").innerHTML += `<option value="${project['p_id']}">${project["path"]}</option>`;
-                }
-                document.getElementById("selected_project").onchange = projectSelected;
-                projectSelected();
-            }
-            requestMsc("projects", "Get", data, listProjects);
+            listProjects();
         }
 
         function loginMsc(){
@@ -311,6 +343,7 @@
 
         document.getElementById("mscolab_login").onclick = loginMsc;
         document.getElementById("chat_send").onclick = sendMessage;
+        document.getElementById("project_create_ok").onclick = createProject;
         document.getElementById("login_link").onclick = () => openTab("login_tab");
         document.getElementById("project_link").onclick = () => openTab("project_tab");
         document.getElementById("chat_link").onclick = () => openTab("chat_tab");
@@ -328,6 +361,10 @@
         document.getElementById("mscolab_http_password").addEventListener("keydown", (e) => e.stopPropagation(), false);
         document.getElementById("chat_message").addEventListener("keyup", (e) => e.stopPropagation(), false);
         document.getElementById("chat_message").addEventListener("keydown", (e) => e.stopPropagation(), false);
+        document.getElementById("project_create_path").addEventListener("keyup", (e) => e.stopPropagation(), false);
+        document.getElementById("project_create_path").addEventListener("keydown", (e) => e.stopPropagation(), false);
+        document.getElementById("project_create_description").addEventListener("keyup", (e) => e.stopPropagation(), false);
+        document.getElementById("project_create_description").addEventListener("keydown", (e) => e.stopPropagation(), false);
 
         map.on("click", addWaypoint);
         map.on("popupopen", popupOpened);
@@ -335,7 +372,7 @@
         this.onclose = () => {
             waypoints = [];
             drawWaypoints();
-            socket.disconnect();
+            if(socket) socket.disconnect();
             token = "";
         };
     </script>

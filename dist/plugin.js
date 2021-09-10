@@ -14,7 +14,7 @@ W.loadPlugin(
 /* Mounting options */
 {
   "name": "windy-plugin-mscolab",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "author": "May Bär",
   "repository": {
     "type": "git",
@@ -27,9 +27,9 @@ W.loadPlugin(
   "className": "plugin-lhpane plugin-mobile-fullscreen"
 },
 /* HTML */
-'<b>Mscolab Windy Interface</b> <div class="plugin-content"> <div class="tab"> <button class="tablinks active" id="login_link">Login</button> <button class="tablinks" id="project_link">Projects</button> <button class="tablinks" id="chat_link">Chat</button> </div> <div id="login_tab" class="tabcontent" style="display: block;"> Please enter credentials <br> <input type="text" id="mscolab_url" value="" placeholder="Mscolab URL"><br> <input type="text" id="mscolab_email" value="" placeholder="Your Email"><br> <input type="password" id="mscolab_password" value="" placeholder="Your Password"><br> <button id="mscolab_login">Login</button><br> <div id="status"></div> <div id="http-auth" style="display: none;"> The server requested additional http authentication<br> <input type="text" id="mscolab_http_user" value="" placeholder="HTTP Auth Username"><br> <input type="password" id="mscolab_http_password" value="" placeholder="HTTP Auth Password"> </div> </div> <div id="project_tab" class="tabcontent"> <div id="project_username"></div><br> <div id="project_list"></div><br> Waypoints<br> <ul id="waypoint_list"></ul> </div> <div id="chat_tab" class="tabcontent"> <ul id="chat_list"></ul> <textarea id="chat_message" value="" placeholder="Enter a message..."></textarea><br> <button id="chat_send">Send</button><br> </div> </div>',
+'<b>Mscolab Windy Interface</b> <div class="plugin-content"> <div class="tab"> <button class="tablinks active" id="login_link">Login</button> <button class="tablinks" id="project_link">Projects</button> <button class="tablinks" id="chat_link">Chat</button> </div> <div id="login_tab" class="tabcontent" style="display: block;"> Please enter credentials <br> <input type="text" id="mscolab_url" value="" placeholder="Mscolab URL"><br> <input type="text" id="mscolab_email" value="" placeholder="Your Email"><br> <input type="password" id="mscolab_password" value="" placeholder="Your Password"><br> <button id="mscolab_login">Login</button><br> <div id="status"></div> <div id="http-auth" style="display: none;"> The server requested additional http authentication<br> <input type="text" id="mscolab_http_user" value="" placeholder="HTTP Auth Username"><br> <input type="password" id="mscolab_http_password" value="" placeholder="HTTP Auth Password"> </div> </div> <div id="project_tab" class="tabcontent"> <div id="project_username"></div><br> <div id="project_list"></div><br> <div id="project_create" style="display: none;"> <input type="text" id="project_create_path" value="" placeholder="Project Path"><br> <textarea id="project_create_description" value="" placeholder="Project Description"></textarea><br> <button id="project_create_ok">Create</button> </div> Waypoints<br> <ul id="waypoint_list"></ul> </div> <div id="chat_tab" class="tabcontent"> <ul id="chat_list"></ul> <textarea id="chat_message" value="" placeholder="Enter a message..."></textarea><br> <button id="chat_send">Send</button><br> </div> </div>',
 /* CSS */
-'.onwindy-plugin-mscolab .left-border{left:400px}.onwindy-plugin-mscolab #search{display:none}#windy-plugin-mscolab{width:400px;height:100%}#windy-plugin-mscolab .plugin-content{padding:20px 15px 15px 15px;font-size:14px;line-height:1.6;color:white;background:rgba(0,0,0,0.5)}.tab{overflow:hidden;border:1px solid #5c5c5c;background-color:#353535}.tab button{background-color:#3535356e;color:whitesmoke;float:left;border:none;outline:none;cursor:pointer;padding:14px 16px;transition:.3s;font-size:17px}.tab button:hover{background-color:#5c5c5c}.tab button.active{background-color:#707070}.tabcontent{display:none;padding:6px 12px;-webkit-animation:fadeEffect 1s;animation:fadeEffect 1s}.tabcontent::after{content:"";clear:both;display:block;float:none}@-webkit-keyframes fadeEffect{from{opacity:0}to{opacity:1}}@keyframes fadeEffect{from{opacity:0}to{opacity:1}}select{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#000;padding:0 1em 0 0;margin:0;width:100%;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}ul{list-style-type:none;margin:0;padding:0}li{color:whitesmoke;border-bottom:1px solid #5c5c5c;transition:font-size .3s ease,background-color .3s ease}li:last-child{border:none}li:hover{background:#5c5c5c}',
+'.onwindy-plugin-mscolab .left-border{left:400px}.onwindy-plugin-mscolab #search{display:none}#windy-plugin-mscolab{width:400px;height:100%}#windy-plugin-mscolab .plugin-content{padding:20px 15px 15px 15px;font-size:14px;line-height:1.6;color:white;background:rgba(0,0,0,0.5)}.tab{overflow:hidden;border:1px solid #5c5c5c;background-color:#353535}.tab button{background-color:#3535356e;color:whitesmoke;float:left;border:none;outline:none;cursor:pointer;padding:14px 16px;transition:.3s;font-size:17px}.tab button:hover{background-color:#5c5c5c}.tab button.active{background-color:#707070}.tabcontent{display:none;padding:6px 12px;-webkit-animation:fadeEffect 1s;animation:fadeEffect 1s}.tabcontent::after{content:"";clear:both;display:block;float:none}@-webkit-keyframes fadeEffect{from{opacity:0}to{opacity:1}}@keyframes fadeEffect{from{opacity:0}to{opacity:1}}select{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#000;padding:0 1em 0 0;margin:0;width:100%;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}input{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}button{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit;transition:font-size .3s ease,background-color .3s ease}button:hover{background:#5c5c5c}textarea{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}ul{list-style-type:none;margin:0;padding:0}li{color:whitesmoke;border-bottom:1px solid #5c5c5c;background-color:rgba(0,0,0,0.3);transition:font-size .3s ease,background-color .3s ease}li:last-child{border:none}li:hover{background:#5c5c5c}',
 /* Constructor */
 function () {
   var bcast = W.require('broadcast');
@@ -116,9 +116,17 @@ function () {
       });
     } else {
       fetch(url, request_data).then(function (response) {
-        if (response.ok) return response.json();else throw Error(response.statusText);
-      }).then(function (r_data) {
-        return callback(r_data);
+        if (response.ok) return response.text();else throw Error(response.statusText);
+      }).then(function (text) {
+        var data = "";
+
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          data = text;
+        }
+
+        callback(data);
       })["catch"](function (error) {
         console.log(error);
         document.getElementById("status").innerHTML = error.toString().fontcolor("red");
@@ -236,6 +244,20 @@ function () {
     document.getElementById("chat_list").innerHTML += "<li id=\"Chat_".concat(message.id, "\"><").concat(message.time, "> ").concat(message.username, " said:<br>").concat(message.text, "</li>");
   }
 
+  function createProject() {
+    var path = document.getElementById("project_create_path").value;
+    var description = document.getElementById("project_create_description").value;
+    var data = {
+      "token": token,
+      "path": path,
+      "description": description
+    };
+
+    if (path.length > 0) {
+      requestMsc("create_project", "Post", data, listProjects);
+    }
+  }
+
   function popupOpened(event) {
     if (waypoints.length > 0) {
       var wp_index = parseInt(event["target"]["_popup"]["_content"].split(".")[0] - 1);
@@ -340,12 +362,17 @@ function () {
       drawWaypoints();
     }
 
-    var data = {
-      "token": token,
-      "p_id": id
-    };
-    requestMsc("get_project_by_id", "Get", data, loadProject);
-    loadChat();
+    if (id > -1) {
+      document.getElementById("project_create").style.display = "none";
+      var data = {
+        "token": token,
+        "p_id": id
+      };
+      requestMsc("get_project_by_id", "Get", data, loadProject);
+      loadChat();
+    } else {
+      document.getElementById("project_create").style.display = "block";
+    }
   }
 
   function getSelectedProject() {
@@ -367,6 +394,30 @@ function () {
       "p_id": getSelectedProject()
     };
     requestMsc("messages", "Get", data, onLoaded);
+  }
+
+  function listProjects() {
+    document.getElementById("project_create_path").value = "";
+    document.getElementById("project_create_description").value = "";
+
+    function onLoad(response_data) {
+      projects = response_data["projects"];
+      document.getElementById("project_list").innerHTML = "Projects: <select name=\"projects\" id=\"selected_project\"></select>";
+
+      for (var project_index in projects) {
+        var project = projects[project_index];
+        document.getElementById("selected_project").innerHTML += "<option value=\"".concat(project['p_id'], "\">").concat(project["path"], "</option>");
+      }
+
+      document.getElementById("selected_project").innerHTML += "<option value=\"-1\">Create New Project</option>";
+      document.getElementById("selected_project").onchange = projectSelected;
+      projectSelected();
+    }
+
+    var data = {
+      "token": token
+    };
+    requestMsc("projects", "Get", data, onLoad);
   }
 
   function postLogin(response_data) {
@@ -391,21 +442,7 @@ function () {
       openTab("login_tab");
     });
     openTab("project_tab");
-
-    function listProjects(response_data) {
-      projects = response_data["projects"];
-      document.getElementById("project_list").innerHTML = "Projects: <select name=\"projects\" id=\"selected_project\"></select>";
-
-      for (var project_index in projects) {
-        var project = projects[project_index];
-        document.getElementById("selected_project").innerHTML += "<option value=\"".concat(project['p_id'], "\">").concat(project["path"], "</option>");
-      }
-
-      document.getElementById("selected_project").onchange = projectSelected;
-      projectSelected();
-    }
-
-    requestMsc("projects", "Get", data, listProjects);
+    listProjects();
   }
 
   function loginMsc() {
@@ -422,6 +459,7 @@ function () {
 
   document.getElementById("mscolab_login").onclick = loginMsc;
   document.getElementById("chat_send").onclick = sendMessage;
+  document.getElementById("project_create_ok").onclick = createProject;
 
   document.getElementById("login_link").onclick = function () {
     return openTab("login_tab");
@@ -469,6 +507,18 @@ function () {
     return e.stopPropagation();
   }, false);
   document.getElementById("chat_message").addEventListener("keydown", function (e) {
+    return e.stopPropagation();
+  }, false);
+  document.getElementById("project_create_path").addEventListener("keyup", function (e) {
+    return e.stopPropagation();
+  }, false);
+  document.getElementById("project_create_path").addEventListener("keydown", function (e) {
+    return e.stopPropagation();
+  }, false);
+  document.getElementById("project_create_description").addEventListener("keyup", function (e) {
+    return e.stopPropagation();
+  }, false);
+  document.getElementById("project_create_description").addEventListener("keydown", function (e) {
     return e.stopPropagation();
   }, false);
   map.on("click", addWaypoint);
