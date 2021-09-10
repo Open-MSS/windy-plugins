@@ -14,7 +14,7 @@ W.loadPlugin(
 /* Mounting options */
 {
   "name": "windy-plugin-mscolab",
-  "version": "0.1.4",
+  "version": "0.2.1",
   "author": "May Bär",
   "repository": {
     "type": "git",
@@ -27,16 +27,15 @@ W.loadPlugin(
   "className": "plugin-lhpane plugin-mobile-fullscreen"
 },
 /* HTML */
-'<b>Mscolab Windy Interface</b> <div class="plugin-content"> <div class="tab"> <button class="tablinks active" id="login_link">Login</button> <button class="tablinks" id="project_link">Projects</button> <button class="tablinks" id="chat_link">Chat</button> </div> <div id="login_tab" class="tabcontent" style="display: block;"> Please enter credentials <br> <input type="text" id="mscolab_url" value="" placeholder="Mscolab URL"><br> <input type="text" id="mscolab_email" value="" placeholder="Your Email"><br> <input type="password" id="mscolab_password" value="" placeholder="Your Password"><br> <button id="mscolab_login">Login</button><br> <div id="status"></div> <div id="http-auth" style="display: none;"> The server requested additional http authentication<br> <input type="text" id="mscolab_http_user" value="" placeholder="HTTP Auth Username"><br> <input type="password" id="mscolab_http_password" value="" placeholder="HTTP Auth Password"> </div> </div> <div id="project_tab" class="tabcontent"> <div id="project_username"></div><br> <div id="project_list"></div><br> <div id="project_create" style="display: none;"> <input type="text" id="project_create_path" value="" placeholder="Project Path"><br> <textarea id="project_create_description" value="" placeholder="Project Description"></textarea><br> <button id="project_create_ok">Create</button> </div> Waypoints<br> <ul id="waypoint_list"></ul> </div> <div id="chat_tab" class="tabcontent"> <ul id="chat_list"></ul> <textarea id="chat_message" value="" placeholder="Enter a message..."></textarea><br> <button id="chat_send">Send</button><br> </div> </div>',
+'<b>Mscolab Windy Interface</b> <div class="plugin-content"> <div class="tab"> <button class="tablinks active" id="login_link">Login</button> <div name="logged_in" style="display: none;"> <button class="tablinks" id="project_link">Projects</button> <div name="waypoints"> <button class="tablinks" id="chat_link">Chat</button> </div> </div> <div name="project_admin" style="display: none;"> <button class="tablinks" id="manage_link">Manage</button> </div> </div> <div id="login_tab" class="tabcontent" style="display: block;"> Please enter credentials <br> <input type="text" id="mscolab_url" value="" placeholder="Mscolab URL"><br> <input type="text" id="mscolab_email" value="" placeholder="Your Email"><br> <input type="password" id="mscolab_password" value="" placeholder="Your Password"><br> <button id="mscolab_login">Login</button><br> <div id="status"></div> <div id="http-auth" style="display: none;"> The server requested additional http authentication<br> <input type="text" id="mscolab_http_user" value="" placeholder="HTTP Auth Username"><br> <input type="password" id="mscolab_http_password" value="" placeholder="HTTP Auth Password"> </div> </div> <div id="project_tab" class="tabcontent"> <div id="project_username"></div><br> <div id="project_list"></div><br> <div id="project_create" style="display: none;"> <input type="text" id="project_create_path" value="" placeholder="Project Path"><br> <textarea id="project_create_description" value="" placeholder="Project Description"></textarea><br> <button id="project_create_ok">Create</button> </div> <div name="waypoints"> Waypoints<br> <ul id="waypoint_list"></ul> </div> </div> <div id="manage_tab" class="tabcontent"> <div name="project_admin" style="display: none;"> Add a user to your project:<br> <select id="project_manage_user"></select> <select id="project_manage_permission"> <option value="admin">Admin</option> <option value="collaborator">Collaborator</option> <option value="viewer">Viewer</option> </select><button id="project_manage">Add</button><br> Users in this project:<br> <ul id="project_manage_user_list"></ul><br><br> <div name="project_creator" style="display: none;"> Delete your project:<br> <button id="project_manage_delete">Delete</button><br> </div> </div> </div> <div id="chat_tab" class="tabcontent"> <ul id="chat_list"></ul> <textarea id="chat_message" value="" placeholder="Enter a message..."></textarea><br> <button id="chat_send">Send</button><br> </div> </div>',
 /* CSS */
-'.onwindy-plugin-mscolab .left-border{left:400px}.onwindy-plugin-mscolab #search{display:none}#windy-plugin-mscolab{width:400px;height:100%}#windy-plugin-mscolab .plugin-content{padding:20px 15px 15px 15px;font-size:14px;line-height:1.6;color:white;background:rgba(0,0,0,0.5)}.tab{overflow:hidden;border:1px solid #5c5c5c;background-color:#353535}.tab button{background-color:#3535356e;color:whitesmoke;float:left;border:none;outline:none;cursor:pointer;padding:14px 16px;transition:.3s;font-size:17px}.tab button:hover{background-color:#5c5c5c}.tab button.active{background-color:#707070}.tabcontent{display:none;padding:6px 12px;-webkit-animation:fadeEffect 1s;animation:fadeEffect 1s}.tabcontent::after{content:"";clear:both;display:block;float:none}@-webkit-keyframes fadeEffect{from{opacity:0}to{opacity:1}}@keyframes fadeEffect{from{opacity:0}to{opacity:1}}select{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#000;padding:0 1em 0 0;margin:0;width:100%;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}input{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}button{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit;transition:font-size .3s ease,background-color .3s ease}button:hover{background:#5c5c5c}textarea{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}ul{list-style-type:none;margin:0;padding:0}li{color:whitesmoke;border-bottom:1px solid #5c5c5c;background-color:rgba(0,0,0,0.3);transition:font-size .3s ease,background-color .3s ease}li:last-child{border:none}li:hover{background:#5c5c5c}',
+'.onwindy-plugin-mscolab .left-border{left:400px}.onwindy-plugin-mscolab #search{display:none}#windy-plugin-mscolab{width:400px;height:100%}#windy-plugin-mscolab .plugin-content{padding:20px 15px 15px 15px;font-size:14px;line-height:1.6;color:white;background:rgba(0,0,0,0.5)}.tab{overflow:hidden;border:1px solid #5c5c5c;background-color:#353535}.tab button{background-color:#3535356e;color:whitesmoke;float:left;border:none;outline:none;cursor:pointer;padding:14px 16px;transition:.3s;font-size:17px}.tab button:hover{background-color:#5c5c5c}.tab button.active{background-color:#707070}.tabcontent{display:none;padding:6px 12px;-webkit-animation:fadeEffect 1s;animation:fadeEffect 1s}.tabcontent::after{content:"";clear:both;display:block;float:none}@-webkit-keyframes fadeEffect{from{opacity:0}to{opacity:1}}@keyframes fadeEffect{from{opacity:0}to{opacity:1}}select{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;width:100%;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}input{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}button{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit;transition:font-size .3s ease,background-color .3s ease}button:hover{background:#5c5c5c}textarea{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}ul{list-style-type:none;margin:0;padding:0}li{color:whitesmoke;border-bottom:1px solid #5c5c5c;background-color:rgba(0,0,0,0.3);transition:font-size .3s ease,background-color .3s ease}li:last-child{border:none}li:hover{background:#5c5c5c}',
 /* Constructor */
 function () {
   var bcast = W.require('broadcast');
 
   var map = W.require('map');
 
-  var websocket = null;
   var token = null;
   var projects = null;
   var userId = null;
@@ -49,6 +48,27 @@ function () {
     iconSize: [80, 40],
     iconAnchor: [40, 20]
   });
+
+  function divVisibility(name) {
+    var display = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "block";
+
+    var _iterator = _createForOfIteratorHelper(document.getElementsByName(name)),
+        _step;
+
+    try {
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        var element = _step.value;
+        if (element.style) element.style.display = display;
+      }
+    } catch (err) {
+      _iterator.e(err);
+    } finally {
+      _iterator.f();
+    }
+
+    var element = document.getElementById(name);
+    if (element && element.style) element.style.display = display;
+  }
 
   function openTab(tabName) {
     var i, tabcontent, tablinks;
@@ -141,12 +161,12 @@ function () {
     var xmlWaypoint = "<Waypoint flightlevel=\"ALTITUDE\" lat=\"LATITUDE\" location=\"LOCATION\" lon=\"LONGITUDE\"><Comments>COMMENT</Comments></Waypoint>";
     var xmlWaypoints = [];
 
-    var _iterator = _createForOfIteratorHelper(waypoints),
-        _step;
+    var _iterator2 = _createForOfIteratorHelper(waypoints),
+        _step2;
 
     try {
-      for (_iterator.s(); !(_step = _iterator.n()).done;) {
-        var waypoint = _step.value;
+      for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+        var waypoint = _step2.value;
         var lat = waypoint["lat"],
             lon = waypoint["lon"],
             alt = waypoint["alt"],
@@ -155,9 +175,9 @@ function () {
         xmlWaypoints.push(xmlWaypoint.replace("ALTITUDE", alt).replace("LATITUDE", lat).replace("LONGITUDE", lon).replace("COMMENT", com).replace("LOCATION", name));
       }
     } catch (err) {
-      _iterator.e(err);
+      _iterator2.e(err);
     } finally {
-      _iterator.f();
+      _iterator2.f();
     }
 
     var file = xmlBegin + xmlWaypoints.join() + xmlEnd;
@@ -244,6 +264,29 @@ function () {
     document.getElementById("chat_list").innerHTML += "<li id=\"Chat_".concat(message.id, "\"><").concat(message.time, "> ").concat(message.username, " said:<br>").concat(message.text, "</li>");
   }
 
+  function inviteUser() {
+    var p_id = getSelectedProject();
+    var u_id = document.getElementById("project_manage_user").value;
+    var access = document.getElementById("project_manage_permission").value;
+    var data = {
+      "token": token,
+      "p_id": p_id,
+      "selected_userids": "[".concat(u_id, "]"),
+      "selected_access_level": access
+    };
+    requestMsc("add_bulk_permissions", "Post", data, loadUsers);
+  }
+
+  function deleteProject() {
+    var id = getSelectedProject();
+    var data = {
+      "p_id": id,
+      "token": token
+    };
+    requestMsc("delete_project", "Post", data, listProjects);
+    openTab("project_tab");
+  }
+
   function createProject() {
     var path = document.getElementById("project_create_path").value;
     var description = document.getElementById("project_create_description").value;
@@ -303,8 +346,58 @@ function () {
     }
   }
 
+  function loadUsers() {
+    function onLoad(response_data) {
+      var users = response_data.users;
+      document.getElementById("project_manage_user").innerHTML = "";
+
+      var _iterator3 = _createForOfIteratorHelper(users),
+          _step3;
+
+      try {
+        for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+          var user = _step3.value;
+          document.getElementById("project_manage_user").innerHTML += "<option value=\"".concat(user[1], "\">").concat(user[0], "</option>");
+        }
+      } catch (err) {
+        _iterator3.e(err);
+      } finally {
+        _iterator3.f();
+      }
+    }
+
+    function onAddedUsers(response_data) {
+      document.getElementById("project_manage_user_list").innerHTML = "";
+      var users = response_data.users;
+
+      var _iterator4 = _createForOfIteratorHelper(users),
+          _step4;
+
+      try {
+        for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+          var user = _step4.value;
+          document.getElementById("project_manage_user_list").innerHTML += "<li>".concat(user[0], " (").concat(user[1], ")</li>");
+        }
+      } catch (err) {
+        _iterator4.e(err);
+      } finally {
+        _iterator4.f();
+      }
+    }
+
+    requestMsc("users_without_permission", "Get", {
+      "token": token,
+      "p_id": parseInt(getSelectedProject())
+    }, onLoad);
+    requestMsc("users_with_permission", "Get", {
+      "token": token,
+      "p_id": parseInt(getSelectedProject())
+    }, onAddedUsers);
+  }
+
   function projectSelected() {
     var id = getSelectedProject();
+    var access = getSelectedAccessLevel();
 
     function loadProject(response_data) {
       var parser = new DOMParser();
@@ -316,12 +409,12 @@ function () {
       var max_lon = -1000;
       var min_lon = 1000;
 
-      var _iterator2 = _createForOfIteratorHelper(xml_waypoints),
-          _step2;
+      var _iterator5 = _createForOfIteratorHelper(xml_waypoints),
+          _step5;
 
       try {
         var _loop = function _loop() {
-          waypoint = _step2.value;
+          waypoint = _step5.value;
           var lat = waypoint.getAttribute("lat");
           var lon = waypoint.getAttribute("lon");
           var alt = waypoint.getAttribute("flightlevel");
@@ -344,15 +437,15 @@ function () {
           });
         };
 
-        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+        for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
           var waypoint;
 
           _loop();
         }
       } catch (err) {
-        _iterator2.e(err);
+        _iterator5.e(err);
       } finally {
-        _iterator2.f();
+        _iterator5.f();
       }
 
       var southWest = L.latLng(min_lat, min_lon),
@@ -360,6 +453,16 @@ function () {
           bounds = L.latLngBounds(southWest, northEast);
       map.fitBounds(bounds);
       drawWaypoints();
+      divVisibility("waypoints", "block");
+
+      if (access == "creator" || access == "admin") {
+        divVisibility("project_admin", "block");
+        if (access == "creator") divVisibility("project_creator", "block");else divVisibility("project_creator", "none");
+        loadUsers();
+      } else {
+        divVisibility("project_creator", "none");
+        divVisibility("project_admin", "none");
+      }
     }
 
     if (id > -1) {
@@ -371,12 +474,21 @@ function () {
       requestMsc("get_project_by_id", "Get", data, loadProject);
       loadChat();
     } else {
+      waypoints = [];
+      drawWaypoints();
+      divVisibility("waypoints", "none");
       document.getElementById("project_create").style.display = "block";
     }
   }
 
   function getSelectedProject() {
     return document.getElementById("selected_project").value;
+  }
+
+  function getSelectedAccessLevel() {
+    var id = getSelectedProject();
+    var project = document.getElementById("p_".concat(id));
+    if (project) return project.innerText.split(" ").pop().replace("(", "").replace(")", "");
   }
 
   function loadChat() {
@@ -406,7 +518,7 @@ function () {
 
       for (var project_index in projects) {
         var project = projects[project_index];
-        document.getElementById("selected_project").innerHTML += "<option value=\"".concat(project['p_id'], "\">").concat(project["path"], "</option>");
+        document.getElementById("selected_project").innerHTML += "<option id=\"p_".concat(project['p_id'], "\" value=\"").concat(project['p_id'], "\">").concat(project["path"], " (").concat(project["access_level"], ")</option>");
       }
 
       document.getElementById("selected_project").innerHTML += "<option value=\"-1\">Create New Project</option>";
@@ -439,8 +551,12 @@ function () {
     socket.on('disconnect', function () {
       console.log('The client has disconnected!');
       socket.disconnect();
+      divVisibility("logged_in", "none");
+      divVisibility("project_creator", "none");
+      divVisibility("project_admin", "none");
       openTab("login_tab");
     });
+    divVisibility("logged_in", "block");
     openTab("project_tab");
     listProjects();
   }
@@ -460,6 +576,8 @@ function () {
   document.getElementById("mscolab_login").onclick = loginMsc;
   document.getElementById("chat_send").onclick = sendMessage;
   document.getElementById("project_create_ok").onclick = createProject;
+  document.getElementById("project_manage").onclick = inviteUser;
+  document.getElementById("project_manage_delete").onclick = deleteProject;
 
   document.getElementById("login_link").onclick = function () {
     return openTab("login_tab");
@@ -467,6 +585,10 @@ function () {
 
   document.getElementById("project_link").onclick = function () {
     return openTab("project_tab");
+  };
+
+  document.getElementById("manage_link").onclick = function () {
+    return openTab("manage_tab");
   };
 
   document.getElementById("chat_link").onclick = function () {
@@ -527,7 +649,7 @@ function () {
   this.onclose = function () {
     waypoints = [];
     drawWaypoints();
-    socket.disconnect();
+    if (socket) socket.disconnect();
     token = "";
   };
 });

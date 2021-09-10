@@ -3,8 +3,15 @@
     <div class="plugin-content">
         <div class="tab">
             <button class="tablinks active" id="login_link">Login</button>
-            <button class="tablinks" id="project_link">Projects</button>
-            <button class="tablinks" id="chat_link">Chat</button>
+            <div name="logged_in" style="display: none;">
+                <button class="tablinks" id="project_link">Projects</button>
+                <div name="waypoints">
+                    <button class="tablinks" id="chat_link">Chat</button>
+                </div>
+            </div>
+            <div name="project_admin" style="display: none;">
+                <button class="tablinks" id="manage_link">Manage</button>
+            </div>
           </div>
         <div id="login_tab" class="tabcontent" style="display: block;">
             Please enter credentials <br>
@@ -29,8 +36,28 @@
                 <textarea id="project_create_description" value="" placeholder="Project Description"></textarea><br>
                 <button id="project_create_ok">Create</button>
             </div>
-            Waypoints<br>
-            <ul id="waypoint_list"></ul>
+            <div name="waypoints">
+                Waypoints<br>
+                <ul id="waypoint_list"></ul>
+            </div>
+        </div>
+
+        <div id="manage_tab" class="tabcontent">
+            <div name="project_admin" style="display: none;">
+                Add a user to your project:<br>
+                <select id="project_manage_user"></select>
+                <select id="project_manage_permission">
+                    <option value="admin">Admin</option>
+                    <option value="collaborator">Collaborator</option>
+                    <option value="viewer">Viewer</option>
+                </select><button id="project_manage">Add</button><br>
+                Users in this project:<br>
+                <ul id="project_manage_user_list"></ul><br><br>
+                <div name="project_creator" style="display: none;">
+                    Delete your project:<br>
+                    <button id="project_manage_delete">Delete</button><br>
+                </div>
+            </div>
         </div>
 
         <div id="chat_tab" class="tabcontent">
@@ -55,6 +82,15 @@
             iconSize: [80, 40],
             iconAnchor: [40, 20],
         });
+
+        function divVisibility(name, display="block"){
+            for(var element of document.getElementsByName(name)){
+                if(element.style)
+                    element.style.display = display;
+            }
+            var element = document.getElementById(name);
+            if(element && element.style) element.style.display = display;
+        }
 
         function openTab(tabName) {
             var i, tabcontent, tablinks;
@@ -185,6 +221,21 @@
             document.getElementById("chat_list").innerHTML += `<li id="Chat_${message.id}"><${message.time}> ${message.username} said:<br>${message.text}</li>`;
         }
 
+        function inviteUser(){
+            var p_id = getSelectedProject();
+            var u_id = document.getElementById("project_manage_user").value;
+            var access = document.getElementById("project_manage_permission").value;
+            var data = {"token": token, "p_id": p_id, "selected_userids": `[${u_id}]`, "selected_access_level": access};
+            requestMsc("add_bulk_permissions", "Post", data, loadUsers);
+        }
+
+        function deleteProject(){
+            var id = getSelectedProject();
+            var data = {"p_id": id, "token": token};
+            requestMsc("delete_project", "Post", data, listProjects);
+            openTab("project_tab");
+        }
+
         function createProject(){
             var path = document.getElementById("project_create_path").value;
             var description = document.getElementById("project_create_description").value;
@@ -228,8 +279,28 @@
             }
         }
 
+        function loadUsers(){
+            function onLoad(response_data){
+                var users = response_data.users;
+                document.getElementById("project_manage_user").innerHTML = "";
+                for(var user of users){
+                    document.getElementById("project_manage_user").innerHTML += `<option value="${user[1]}">${user[0]}</option>`;
+                }
+            }
+            function onAddedUsers(response_data){
+                document.getElementById("project_manage_user_list").innerHTML = "";
+                var users = response_data.users;
+                for(var user of users){
+                    document.getElementById("project_manage_user_list").innerHTML += `<li>${user[0]} (${user[1]})</li>`;
+                }
+            }
+            requestMsc("users_without_permission", "Get", {"token": token, "p_id": parseInt(getSelectedProject())}, onLoad);
+            requestMsc("users_with_permission", "Get", {"token": token, "p_id": parseInt(getSelectedProject())}, onAddedUsers);
+        }
+
         function projectSelected(){
             var id = getSelectedProject();
+            var access = getSelectedAccessLevel();
 
             function loadProject(response_data){
                 var parser = new DOMParser();
@@ -256,6 +327,20 @@
                     bounds = L.latLngBounds(southWest, northEast);
                 map.fitBounds(bounds);
                 drawWaypoints();
+                
+                divVisibility("waypoints", "block");
+                if(access == "creator" || access == "admin"){
+                    divVisibility("project_admin", "block");
+                    if(access == "creator")
+                        divVisibility("project_creator", "block");
+                    else
+                        divVisibility("project_creator", "none");
+                    loadUsers();
+                }
+                else{
+                    divVisibility("project_creator", "none");
+                    divVisibility("project_admin", "none");
+                }
             }
             if(id > -1){
                 document.getElementById("project_create").style.display = "none";
@@ -263,12 +348,21 @@
                 requestMsc("get_project_by_id", "Get", data, loadProject);
                 loadChat();
             } else {
+                waypoints = [];
+                drawWaypoints();
+                divVisibility("waypoints", "none");
                 document.getElementById("project_create").style.display = "block";
             }
         }
 
         function getSelectedProject(){
             return document.getElementById("selected_project").value;
+        }
+
+        function getSelectedAccessLevel(){
+            var id = getSelectedProject();
+            var project = document.getElementById(`p_${id}`);
+            if(project) return project.innerText.split(" ").pop().replace("(", "").replace(")", "");
         }
 
         function loadChat(){
@@ -292,7 +386,7 @@
                 document.getElementById("project_list").innerHTML = `Projects: <select name="projects" id="selected_project"></select>`;
                 for(var project_index in projects){
                     var project = projects[project_index];
-                    document.getElementById("selected_project").innerHTML += `<option value="${project['p_id']}">${project["path"]}</option>`;
+                    document.getElementById("selected_project").innerHTML += `<option id="p_${project['p_id']}" value="${project['p_id']}">${project["path"]} (${project["access_level"]})</option>`;
                 }
                 document.getElementById("selected_project").innerHTML += `<option value="-1">Create New Project</option>`;
                 document.getElementById("selected_project").onchange = projectSelected;
@@ -323,9 +417,13 @@
             socket.on('disconnect',function() {
                 console.log('The client has disconnected!');
                 socket.disconnect();
+                divVisibility("logged_in", "none");
+                divVisibility("project_creator", "none");
+                divVisibility("project_admin", "none");
                 openTab("login_tab");
             });
 
+            divVisibility("logged_in", "block");
             openTab("project_tab")
             listProjects();
         }
@@ -344,8 +442,11 @@
         document.getElementById("mscolab_login").onclick = loginMsc;
         document.getElementById("chat_send").onclick = sendMessage;
         document.getElementById("project_create_ok").onclick = createProject;
+        document.getElementById("project_manage").onclick = inviteUser;
+        document.getElementById("project_manage_delete").onclick = deleteProject;
         document.getElementById("login_link").onclick = () => openTab("login_tab");
         document.getElementById("project_link").onclick = () => openTab("project_tab");
+        document.getElementById("manage_link").onclick = () => openTab("manage_tab");
         document.getElementById("chat_link").onclick = () => openTab("chat_tab");
 
         // Disable Windy shortcuts while inputting information
