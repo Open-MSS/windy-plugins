@@ -62,7 +62,7 @@
 
         <div id="chat_tab" class="tabcontent">
             <ul id="chat_list"></ul>
-            <textarea id="chat_message" value="" placeholder="Enter a message..."></textarea><br>
+            <textarea id="chat_message" value="" placeholder="Enter a message..." style="width: 100%;"></textarea><br>
             <button id="chat_send">Send</button><br>
         </div>
     </div>
@@ -76,6 +76,7 @@
         var waypoints = [];
         var markers = [];
         var socket = null;
+        var selectedProject = -1;
 
         const icon = L.divIcon({
             className: 'weather-at-city',
@@ -172,6 +173,26 @@
             }
         }
 
+        function onAccessRevoked(event){
+            event = JSON.parse(event);
+            const p_id = event["p_id"];
+            const u_id = event["u_id"];
+            if(u_id == userId){
+                console.log('Removing project ' + p_id);
+                listProjects();
+            }
+        }
+
+        function onPermissionUpdated(event){
+            event = JSON.parse(event);
+            const p_id = event["p_id"];
+            const u_id = event["u_id"];
+            if(p_id == getSelectedProject() && u_id == userId){
+                console.log('Updating permission for ' + p_id);
+                listProjects();
+            }
+        }
+
         function moveWaypoint(event){
             if(waypoints.length > 0){
                 const wp_index = event["target"]["options"]["title"] - 1;
@@ -227,6 +248,19 @@
             var access = document.getElementById("project_manage_permission").value;
             var data = {"token": token, "p_id": p_id, "selected_userids": `[${u_id}]`, "selected_access_level": access};
             requestMsc("add_bulk_permissions", "Post", data, loadUsers);
+        }
+
+        function updateUser(u_id, access){
+            var p_id = getSelectedProject();
+            if(access != "remove"){
+                var data = {"token": token, "p_id": p_id, "selected_userids": `[${u_id}]`, "selected_access_level": access};
+                console.log(data);
+                requestMsc("modify_bulk_permissions", "Post", data, loadUsers);
+            } else {
+                var data = {"token": token, "p_id": p_id, "selected_userids": `[${u_id}]`};
+                console.log(data);
+                requestMsc("delete_bulk_permissions", "Post", data, loadUsers);
+            }
         }
 
         function deleteProject(){
@@ -291,7 +325,16 @@
                 document.getElementById("project_manage_user_list").innerHTML = "";
                 var users = response_data.users;
                 for(var user of users){
-                    document.getElementById("project_manage_user_list").innerHTML += `<li>${user[0]} (${user[1]})</li>`;
+                    var li = `<li>${user[0]}`;
+                    var select = `<select id="perm_${user[1]}_${user[0]}" style="width: 30%; float: right; padding: 0px; border-width: 0px; height: 19px;">
+                                    <option value="admin">Admin</option>
+                                    <option value="collaborator">Collaborator</option>
+                                    <option value="viewer">Viewer</option>
+                                    <option value="remove">Remove</option>
+                                  </select></li>`
+                    select = select.replace(user[1] + "\"", user[1] + "\" selected");
+                    document.getElementById("project_manage_user_list").innerHTML += li + select;
+                    document.getElementById(`perm_${user[1]}_${user[0]}`).onchange = () => updateUser(user[2], document.getElementById(`perm_${user[1]}_${user[0]}`).value);
                 }
             }
             requestMsc("users_without_permission", "Get", {"token": token, "p_id": parseInt(getSelectedProject())}, onLoad);
@@ -322,10 +365,15 @@
                     min_lon = min_lon > lon ? lon : min_lon;
                     waypoints.push({"lat": lat, "lon": lon, "alt": alt, "name": name, "zoom": () => map.setView({ lat: lat, lng: lon })})
                 }
-                var southWest = L.latLng(min_lat, min_lon),
-                    northEast = L.latLng(max_lat, max_lon),
-                    bounds = L.latLngBounds(southWest, northEast);
-                map.fitBounds(bounds);
+
+                if(selectedProject != id){
+                    var southWest = L.latLng(min_lat, min_lon),
+                        northEast = L.latLng(max_lat, max_lon),
+                        bounds = L.latLngBounds(southWest, northEast);
+                    map.fitBounds(bounds);
+                }
+
+                selectedProject = id;
                 drawWaypoints();
                 
                 divVisibility("waypoints", "block");
@@ -389,6 +437,7 @@
                     document.getElementById("selected_project").innerHTML += `<option id="p_${project['p_id']}" value="${project['p_id']}">${project["path"]} (${project["access_level"]})</option>`;
                 }
                 document.getElementById("selected_project").innerHTML += `<option value="-1">Create New Project</option>`;
+                document.getElementById("selected_project").innerHTML = document.getElementById("selected_project").innerHTML.replace(`p_${selectedProject}"`, `p_${selectedProject}" selected`);
                 document.getElementById("selected_project").onchange = projectSelected;
                 projectSelected();
             }
@@ -404,7 +453,15 @@
             userId = response_data["user"]["id"];
             var test = document.getElementById("project_username");
             test.innerHTML = "Logged in as " + username;
+            if(socket) socket.disconnect();
             socket = io.connect(msc_url);
+            var onevent = socket.onevent;
+            socket.onevent = function (packet) {
+                var args = packet.data || [];
+                onevent.call (this, packet); // original call
+                packet.data = ["*"].concat(args);
+                onevent.call(this, packet); // additional call to catch-all
+            };
             // Add a connect listener
             socket.on('connect',function() {
                 console.log('Client has connected to the server!');
@@ -413,6 +470,9 @@
             // Add a connect listener
             socket.on('file-changed', projectUpdated);
             socket.on('chat-message-client', messageReceived);
+            socket.on('revoke-permission', onAccessRevoked);
+            socket.on('update-permission', onPermissionUpdated);
+            socket.on('*', (event, data) => console.log(`Received event ${event}: ${data}`));
             // Add a disconnect listener
             socket.on('disconnect',function() {
                 console.log('The client has disconnected!');

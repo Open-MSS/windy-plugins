@@ -14,7 +14,7 @@ W.loadPlugin(
 /* Mounting options */
 {
   "name": "windy-plugin-mscolab",
-  "version": "0.2.1",
+  "version": "0.2.3",
   "author": "May Bär",
   "repository": {
     "type": "git",
@@ -27,7 +27,7 @@ W.loadPlugin(
   "className": "plugin-lhpane plugin-mobile-fullscreen"
 },
 /* HTML */
-'<b>Mscolab Windy Interface</b> <div class="plugin-content"> <div class="tab"> <button class="tablinks active" id="login_link">Login</button> <div name="logged_in" style="display: none;"> <button class="tablinks" id="project_link">Projects</button> <div name="waypoints"> <button class="tablinks" id="chat_link">Chat</button> </div> </div> <div name="project_admin" style="display: none;"> <button class="tablinks" id="manage_link">Manage</button> </div> </div> <div id="login_tab" class="tabcontent" style="display: block;"> Please enter credentials <br> <input type="text" id="mscolab_url" value="" placeholder="Mscolab URL"><br> <input type="text" id="mscolab_email" value="" placeholder="Your Email"><br> <input type="password" id="mscolab_password" value="" placeholder="Your Password"><br> <button id="mscolab_login">Login</button><br> <div id="status"></div> <div id="http-auth" style="display: none;"> The server requested additional http authentication<br> <input type="text" id="mscolab_http_user" value="" placeholder="HTTP Auth Username"><br> <input type="password" id="mscolab_http_password" value="" placeholder="HTTP Auth Password"> </div> </div> <div id="project_tab" class="tabcontent"> <div id="project_username"></div><br> <div id="project_list"></div><br> <div id="project_create" style="display: none;"> <input type="text" id="project_create_path" value="" placeholder="Project Path"><br> <textarea id="project_create_description" value="" placeholder="Project Description"></textarea><br> <button id="project_create_ok">Create</button> </div> <div name="waypoints"> Waypoints<br> <ul id="waypoint_list"></ul> </div> </div> <div id="manage_tab" class="tabcontent"> <div name="project_admin" style="display: none;"> Add a user to your project:<br> <select id="project_manage_user"></select> <select id="project_manage_permission"> <option value="admin">Admin</option> <option value="collaborator">Collaborator</option> <option value="viewer">Viewer</option> </select><button id="project_manage">Add</button><br> Users in this project:<br> <ul id="project_manage_user_list"></ul><br><br> <div name="project_creator" style="display: none;"> Delete your project:<br> <button id="project_manage_delete">Delete</button><br> </div> </div> </div> <div id="chat_tab" class="tabcontent"> <ul id="chat_list"></ul> <textarea id="chat_message" value="" placeholder="Enter a message..."></textarea><br> <button id="chat_send">Send</button><br> </div> </div>',
+'<b>Mscolab Windy Interface</b> <div class="plugin-content"> <div class="tab"> <button class="tablinks active" id="login_link">Login</button> <div name="logged_in" style="display: none;"> <button class="tablinks" id="project_link">Projects</button> <div name="waypoints"> <button class="tablinks" id="chat_link">Chat</button> </div> </div> <div name="project_admin" style="display: none;"> <button class="tablinks" id="manage_link">Manage</button> </div> </div> <div id="login_tab" class="tabcontent" style="display: block;"> Please enter credentials <br> <input type="text" id="mscolab_url" value="" placeholder="Mscolab URL"><br> <input type="text" id="mscolab_email" value="" placeholder="Your Email"><br> <input type="password" id="mscolab_password" value="" placeholder="Your Password"><br> <button id="mscolab_login">Login</button><br> <div id="status"></div> <div id="http-auth" style="display: none;"> The server requested additional http authentication<br> <input type="text" id="mscolab_http_user" value="" placeholder="HTTP Auth Username"><br> <input type="password" id="mscolab_http_password" value="" placeholder="HTTP Auth Password"> </div> </div> <div id="project_tab" class="tabcontent"> <div id="project_username"></div><br> <div id="project_list"></div><br> <div id="project_create" style="display: none;"> <input type="text" id="project_create_path" value="" placeholder="Project Path"><br> <textarea id="project_create_description" value="" placeholder="Project Description"></textarea><br> <button id="project_create_ok">Create</button> </div> <div name="waypoints"> Waypoints<br> <ul id="waypoint_list"></ul> </div> </div> <div id="manage_tab" class="tabcontent"> <div name="project_admin" style="display: none;"> Add a user to your project:<br> <select id="project_manage_user"></select> <select id="project_manage_permission"> <option value="admin">Admin</option> <option value="collaborator">Collaborator</option> <option value="viewer">Viewer</option> </select><button id="project_manage">Add</button><br> Users in this project:<br> <ul id="project_manage_user_list"></ul><br><br> <div name="project_creator" style="display: none;"> Delete your project:<br> <button id="project_manage_delete">Delete</button><br> </div> </div> </div> <div id="chat_tab" class="tabcontent"> <ul id="chat_list"></ul> <textarea id="chat_message" value="" placeholder="Enter a message..." style="width: 100%;"></textarea><br> <button id="chat_send">Send</button><br> </div> </div>',
 /* CSS */
 '.onwindy-plugin-mscolab .left-border{left:400px}.onwindy-plugin-mscolab #search{display:none}#windy-plugin-mscolab{width:400px;height:100%}#windy-plugin-mscolab .plugin-content{padding:20px 15px 15px 15px;font-size:14px;line-height:1.6;color:white;background:rgba(0,0,0,0.5)}.tab{overflow:hidden;border:1px solid #5c5c5c;background-color:#353535}.tab button{background-color:#3535356e;color:whitesmoke;float:left;border:none;outline:none;cursor:pointer;padding:14px 16px;transition:.3s;font-size:17px}.tab button:hover{background-color:#5c5c5c}.tab button.active{background-color:#707070}.tabcontent{display:none;padding:6px 12px;-webkit-animation:fadeEffect 1s;animation:fadeEffect 1s}.tabcontent::after{content:"";clear:both;display:block;float:none}@-webkit-keyframes fadeEffect{from{opacity:0}to{opacity:1}}@keyframes fadeEffect{from{opacity:0}to{opacity:1}}select{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;width:100%;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}input{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}button{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit;transition:font-size .3s ease,background-color .3s ease}button:hover{background:#5c5c5c}textarea{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}ul{list-style-type:none;margin:0;padding:0}li{color:whitesmoke;border-bottom:1px solid #5c5c5c;background-color:rgba(0,0,0,0.3);transition:font-size .3s ease,background-color .3s ease}li:last-child{border:none}li:hover{background:#5c5c5c}',
 /* Constructor */
@@ -43,6 +43,7 @@ function () {
   var waypoints = [];
   var markers = [];
   var socket = null;
+  var selectedProject = -1;
   var icon = L.divIcon({
     className: 'weather-at-city',
     iconSize: [80, 40],
@@ -200,6 +201,28 @@ function () {
     }
   }
 
+  function onAccessRevoked(event) {
+    event = JSON.parse(event);
+    var p_id = event["p_id"];
+    var u_id = event["u_id"];
+
+    if (u_id == userId) {
+      console.log('Removing project ' + p_id);
+      listProjects();
+    }
+  }
+
+  function onPermissionUpdated(event) {
+    event = JSON.parse(event);
+    var p_id = event["p_id"];
+    var u_id = event["u_id"];
+
+    if (p_id == getSelectedProject() && u_id == userId) {
+      console.log('Updating permission for ' + p_id);
+      listProjects();
+    }
+  }
+
   function moveWaypoint(event) {
     if (waypoints.length > 0) {
       var wp_index = event["target"]["options"]["title"] - 1;
@@ -275,6 +298,29 @@ function () {
       "selected_access_level": access
     };
     requestMsc("add_bulk_permissions", "Post", data, loadUsers);
+  }
+
+  function updateUser(u_id, access) {
+    var p_id = getSelectedProject();
+
+    if (access != "remove") {
+      var data = {
+        "token": token,
+        "p_id": p_id,
+        "selected_userids": "[".concat(u_id, "]"),
+        "selected_access_level": access
+      };
+      console.log(data);
+      requestMsc("modify_bulk_permissions", "Post", data, loadUsers);
+    } else {
+      var data = {
+        "token": token,
+        "p_id": p_id,
+        "selected_userids": "[".concat(u_id, "]")
+      };
+      console.log(data);
+      requestMsc("delete_bulk_permissions", "Post", data, loadUsers);
+    }
   }
 
   function deleteProject() {
@@ -376,7 +422,14 @@ function () {
       try {
         for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
           var user = _step4.value;
-          document.getElementById("project_manage_user_list").innerHTML += "<li>".concat(user[0], " (").concat(user[1], ")</li>");
+          var li = "<li>".concat(user[0]);
+          var select = "<select id=\"perm_".concat(user[1], "_").concat(user[0], "\" style=\"width: 30%; float: right; padding: 0px; border-width: 0px; height: 19px;\">\n                                    <option value=\"admin\">Admin</option>\n                                    <option value=\"collaborator\">Collaborator</option>\n                                    <option value=\"viewer\">Viewer</option>\n                                    <option value=\"remove\">Remove</option>\n                                  </select></li>");
+          select = select.replace(user[1] + "\"", user[1] + "\" selected");
+          document.getElementById("project_manage_user_list").innerHTML += li + select;
+
+          document.getElementById("perm_".concat(user[1], "_").concat(user[0])).onchange = function () {
+            return updateUser(user[2], document.getElementById("perm_".concat(user[1], "_").concat(user[0])).value);
+          };
         }
       } catch (err) {
         _iterator4.e(err);
@@ -448,10 +501,14 @@ function () {
         _iterator5.f();
       }
 
-      var southWest = L.latLng(min_lat, min_lon),
-          northEast = L.latLng(max_lat, max_lon),
-          bounds = L.latLngBounds(southWest, northEast);
-      map.fitBounds(bounds);
+      if (selectedProject != id) {
+        var southWest = L.latLng(min_lat, min_lon),
+            northEast = L.latLng(max_lat, max_lon),
+            bounds = L.latLngBounds(southWest, northEast);
+        map.fitBounds(bounds);
+      }
+
+      selectedProject = id;
       drawWaypoints();
       divVisibility("waypoints", "block");
 
@@ -522,6 +579,7 @@ function () {
       }
 
       document.getElementById("selected_project").innerHTML += "<option value=\"-1\">Create New Project</option>";
+      document.getElementById("selected_project").innerHTML = document.getElementById("selected_project").innerHTML.replace("p_".concat(selectedProject, "\""), "p_".concat(selectedProject, "\" selected"));
       document.getElementById("selected_project").onchange = projectSelected;
       projectSelected();
     }
@@ -541,13 +599,28 @@ function () {
     userId = response_data["user"]["id"];
     var test = document.getElementById("project_username");
     test.innerHTML = "Logged in as " + username;
+    if (socket) socket.disconnect();
     socket = io.connect(msc_url);
+    var onevent = socket.onevent;
+
+    socket.onevent = function (packet) {
+      var args = packet.data || [];
+      onevent.call(this, packet);
+      packet.data = ["*"].concat(args);
+      onevent.call(this, packet);
+    };
+
     socket.on('connect', function () {
       console.log('Client has connected to the server!');
       socket.emit("start", data);
     });
     socket.on('file-changed', projectUpdated);
     socket.on('chat-message-client', messageReceived);
+    socket.on('revoke-permission', onAccessRevoked);
+    socket.on('update-permission', onPermissionUpdated);
+    socket.on('*', function (event, data) {
+      return console.log("Received event ".concat(event, ": ").concat(data));
+    });
     socket.on('disconnect', function () {
       console.log('The client has disconnected!');
       socket.disconnect();
