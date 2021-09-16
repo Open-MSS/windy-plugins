@@ -14,7 +14,7 @@ W.loadPlugin(
 /* Mounting options */
 {
   "name": "windy-plugin-mscolab",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "author": "May Bär",
   "repository": {
     "type": "git",
@@ -27,9 +27,9 @@ W.loadPlugin(
   "className": "plugin-lhpane plugin-mobile-fullscreen"
 },
 /* HTML */
-'<b>Mscolab Windy Interface</b> <div class="plugin-content"> <div class="tab"> <button class="tablinks active" id="login_link">Login</button> <div name="logged_in" style="display: none;"> <button class="tablinks" id="project_link">Projects</button> <div name="waypoints"> <button class="tablinks" id="chat_link">Chat</button> </div> </div> <div name="project_admin" style="display: none;"> <button class="tablinks" id="manage_link">Manage</button> </div> </div> <div id="login_tab" class="tabcontent" style="display: block;"> Please enter credentials <br> <input type="text" id="mscolab_url" value="" placeholder="Mscolab URL"><br> <input type="text" id="mscolab_email" value="" placeholder="Your Email"><br> <input type="password" id="mscolab_password" value="" placeholder="Your Password"><br> <button id="mscolab_login">Login</button><br> <div id="status"></div> <div id="http-auth" style="display: none;"> The server requested additional http authentication<br> <input type="text" id="mscolab_http_user" value="" placeholder="HTTP Auth Username"><br> <input type="password" id="mscolab_http_password" value="" placeholder="HTTP Auth Password"> </div> </div> <div id="project_tab" class="tabcontent"> <div id="project_username"></div><br> <div id="project_list"></div><br> <div id="project_create" style="display: none;"> <input type="text" id="project_create_path" value="" placeholder="Project Path"><br> <textarea id="project_create_description" value="" placeholder="Project Description"></textarea><br> <button id="project_create_ok">Create</button> </div> <div name="waypoints"> Waypoints<br> <ul id="waypoint_list"></ul> </div> </div> <div id="manage_tab" class="tabcontent"> <div name="project_admin" style="display: none;"> Add a user to your project:<br> <select id="project_manage_user"></select> <select id="project_manage_permission"> <option value="admin">Admin</option> <option value="collaborator">Collaborator</option> <option value="viewer">Viewer</option> </select><button id="project_manage">Add</button><br> Users in this project:<br> <ul id="project_manage_user_list"></ul><br><br> <div name="project_creator" style="display: none;"> Delete your project:<br> <button id="project_manage_delete">Delete</button><br> </div> </div> </div> <div id="chat_tab" class="tabcontent"> <ul id="chat_list"></ul> <textarea id="chat_message" value="" placeholder="Enter a message..." style="width: 100%;"></textarea><br> <button id="chat_send">Send</button><br> </div> </div>',
+'<b>Mscolab Windy Interface</b> <div class="plugin-content"> <div class="tab"> <button class="tablinks active" id="login_link">Login</button> <div name="register" style="display: none;"> <button class="tablinks" id="register_link">Register</button> </div> <div name="logged_in" style="display: none;"> <button class="tablinks" id="project_link">Projects</button> <div name="waypoints"> <button class="tablinks" id="chat_link">Chat</button> </div> </div> <div name="project_admin" style="display: none;"> <button class="tablinks" id="manage_link">Manage</button> </div> </div> <div id="login_tab" class="tabcontent" style="display: block;"> Please enter credentials <br> <input type="text" id="mscolab_url" value="" placeholder="Mscolab URL"><br> <input type="text" id="mscolab_email" value="" placeholder="Your Email"><br> <input type="password" id="mscolab_password" value="" placeholder="Your Password"><br> <div id="register_tab" class="tabcontent" style="padding: 0px;"> <input type="password" id="mscolab_password_rpt" value="" placeholder="Repeat Your Password"><br> <input type="text" id="mscolab_name" value="" placeholder="Your Name"><br> <button id="mscolab_register">Register</button><br> </div> <div name="login"> <button id="mscolab_login">Login</button><br> </div> <div name="logged_in" style="display: none;"> <button id="mscolab_logout">Logout</button> <button id="mscolab_delete_user" style="float: right;">Delete Account</button><br> </div> <div id="status" style="font-size: large;"></div> <div id="http-auth" style="display: none;"> The server requested additional http authentication<br> <input type="text" id="mscolab_http_user" value="" placeholder="HTTP Auth Username"><br> <input type="password" id="mscolab_http_password" value="" placeholder="HTTP Auth Password"> </div> </div> <div id="project_tab" class="tabcontent"> <div id="project_username"></div><br> <div id="project_list"></div><br> <div id="project_create" style="display: none;"> <input type="text" id="project_create_path" value="" placeholder="Project Path"><br> <textarea id="project_create_description" value="" placeholder="Project Description"></textarea><br> <button id="project_create_ok">Create</button> <div id="project_status" style="font-size: large;"></div> </div> <div name="waypoints"> Waypoints<br> <ul id="waypoint_list"></ul> </div> </div> <div id="manage_tab" class="tabcontent"> <div name="project_admin" style="display: none;"> Add a user to your project:<br> <select id="project_manage_user"></select> <select id="project_manage_permission"> <option value="admin">Admin</option> <option value="collaborator">Collaborator</option> <option value="viewer">Viewer</option> </select><button id="project_manage">Add</button><br> Users in this project:<br> <ul id="project_manage_user_list"></ul><br><br> <div name="project_creator" style="display: none;"> Delete your project:<br> <button id="project_manage_delete">Delete</button><br> </div> </div> </div> <div id="chat_tab" class="tabcontent"> <ul id="chat_list"></ul> <textarea id="chat_message" value="" placeholder="Enter a message..." style="width: 100%;"></textarea><br> <button id="chat_send">Send</button><br> </div> </div>',
 /* CSS */
-'.onwindy-plugin-mscolab .left-border{left:400px}.onwindy-plugin-mscolab #search{display:none}#windy-plugin-mscolab{width:400px;height:100%}#windy-plugin-mscolab .plugin-content{padding:20px 15px 15px 15px;font-size:14px;line-height:1.6;color:white;background:rgba(0,0,0,0.5)}.tab{overflow:hidden;border:1px solid #5c5c5c;background-color:#353535}.tab button{background-color:#3535356e;color:whitesmoke;float:left;border:none;outline:none;cursor:pointer;padding:14px 16px;transition:.3s;font-size:17px}.tab button:hover{background-color:#5c5c5c}.tab button.active{background-color:#707070}.tabcontent{display:none;padding:6px 12px;-webkit-animation:fadeEffect 1s;animation:fadeEffect 1s}.tabcontent::after{content:"";clear:both;display:block;float:none}@-webkit-keyframes fadeEffect{from{opacity:0}to{opacity:1}}@keyframes fadeEffect{from{opacity:0}to{opacity:1}}select{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;width:100%;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}input{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}button{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit;transition:font-size .3s ease,background-color .3s ease}button:hover{background:#5c5c5c}textarea{appearance:none;color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}ul{list-style-type:none;margin:0;padding:0}li{color:whitesmoke;border-bottom:1px solid #5c5c5c;background-color:rgba(0,0,0,0.3);transition:font-size .3s ease,background-color .3s ease}li:last-child{border:none}li:hover{background:#5c5c5c}',
+'.onwindy-plugin-mscolab .left-border{left:400px}.onwindy-plugin-mscolab #search{display:none}#windy-plugin-mscolab{width:400px;height:100%}#windy-plugin-mscolab .plugin-content{padding:20px 15px 15px 15px;font-size:14px;line-height:1.6;color:white;background:rgba(0,0,0,0.5)}.tab{overflow:hidden;border:1px solid #5c5c5c;background-color:#353535}.tab button{background-color:#3535356e;color:whitesmoke;float:left;border:none;outline:none;cursor:pointer;padding:14px 16px;transition:.3s;font-size:17px}.tab button:hover{background-color:#5c5c5c}.tab button.active{background-color:#707070}.tabcontent{display:none;padding:6px 12px;-webkit-animation:fadeEffect 1s;animation:fadeEffect 1s}.tabcontent::after{content:"";clear:both;display:block;float:none}@-webkit-keyframes fadeEffect{from{opacity:0}to{opacity:1}}@keyframes fadeEffect{from{opacity:0}to{opacity:1}}select{color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;width:100%;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}input{color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}button{color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit;transition:font-size .3s ease,background-color .3s ease}button:hover{background:#5c5c5c}textarea{color:whitesmoke;background-color:rgba(0,0,0,0.5);border:#959595;border-style:solid;border-width:2px;padding:5px;margin:2px;font-family:inherit;font-size:inherit;cursor:inherit;line-height:inherit}ul{list-style-type:none;margin:0;padding:0}li{color:whitesmoke;border-bottom:1px solid #5c5c5c;background-color:rgba(0,0,0,0.3);transition:font-size .3s ease,background-color .3s ease}li:last-child{border:none}li:hover{background:#5c5c5c}',
 /* Constructor */
 function () {
   var bcast = W.require('broadcast');
@@ -87,6 +87,12 @@ function () {
 
     document.getElementById(tabName).style.display = "block";
     document.getElementById(tabName.replace("tab", "link")).className += " active";
+    if (tabName == "login_tab" && !token) divVisibility("login");else divVisibility("login", "none");
+
+    if (tabName == "register_tab") {
+      tabName = "login_tab";
+      document.getElementById(tabName).style.display = "block";
+    }
   }
 
   function requestMsc() {
@@ -150,8 +156,11 @@ function () {
         callback(data);
       })["catch"](function (error) {
         console.log(error);
-        document.getElementById("status").innerHTML = error.toString().fontcolor("red");
+        document.getElementById("status").innerHTML = (endpoint + " " + error.toString()).fontcolor("red");
         if (error.toString().toLowerCase().includes("unauthorized")) document.getElementById("http-auth").style.display = "block";
+        if (error.toString().toLowerCase().includes("response_data.user is undefined")) document.getElementById("status").innerHTML = "Login data was incorrect!".fontcolor("red");
+        if (error.toString().toLowerCase().includes("networkerror")) document.getElementById("status").innerHTML = "Mscolab Server did not respond!".fontcolor("red");
+        if (error.toString().toLowerCase().includes("forbidden")) document.getElementById("status").innerHTML = "Your Mscolab URL was likely false!".fontcolor("red");
       });
     }
   }
@@ -343,7 +352,9 @@ function () {
     };
 
     if (path.length > 0) {
-      requestMsc("create_project", "Post", data, listProjects);
+      requestMsc("create_project", "Post", data, function (response) {
+        if (response == "True") listProjects();else document.getElementById("project_status").innerHTML = "A project with that name already exists!".fontcolor("red");
+      });
     }
   }
 
@@ -423,7 +434,7 @@ function () {
         for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
           var user = _step4.value;
           var li = "<li>".concat(user[0]);
-          var select = "<select id=\"perm_".concat(user[1], "_").concat(user[0], "\" style=\"width: 30%; float: right; padding: 0px; border-width: 0px; height: 19px;\">\n                                    <option value=\"admin\">Admin</option>\n                                    <option value=\"collaborator\">Collaborator</option>\n                                    <option value=\"viewer\">Viewer</option>\n                                    <option value=\"remove\">Remove</option>\n                                  </select></li>");
+          var select = "<select id=\"perm_".concat(user[1], "_").concat(user[0], "\" style=\"width: 35%; float: right; padding: 0px 12px; border-width: 0px; height: 19px;\">\n                                    <option value=\"admin\">Admin</option>\n                                    <option value=\"collaborator\">Collaborator</option>\n                                    <option value=\"viewer\">Viewer</option>\n                                    <option value=\"remove\">Remove</option>\n                                  </select></li>");
           select = select.replace(user[1] + "\"", user[1] + "\" selected");
           document.getElementById("project_manage_user_list").innerHTML += li + select;
 
@@ -449,6 +460,7 @@ function () {
   }
 
   function projectSelected() {
+    document.getElementById("project_status").innerHTML = "";
     var id = getSelectedProject();
     var access = getSelectedAccessLevel();
 
@@ -534,6 +546,8 @@ function () {
       waypoints = [];
       drawWaypoints();
       divVisibility("waypoints", "none");
+      divVisibility("project_creator", "none");
+      divVisibility("project_admin", "none");
       document.getElementById("project_create").style.display = "block";
     }
   }
@@ -570,6 +584,7 @@ function () {
     document.getElementById("project_create_description").value = "";
 
     function onLoad(response_data) {
+      console.log(response_data);
       projects = response_data["projects"];
       document.getElementById("project_list").innerHTML = "Projects: <select name=\"projects\" id=\"selected_project\"></select>";
 
@@ -597,8 +612,8 @@ function () {
     };
     var username = response_data["user"]["username"];
     userId = response_data["user"]["id"];
-    var test = document.getElementById("project_username");
-    test.innerHTML = "Logged in as " + username;
+    var p_username = document.getElementById("project_username");
+    p_username.innerHTML = "Logged in as " + username;
     if (socket) socket.disconnect();
     socket = io.connect(msc_url);
     var onevent = socket.onevent;
@@ -624,29 +639,80 @@ function () {
     socket.on('disconnect', function () {
       console.log('The client has disconnected!');
       socket.disconnect();
+      waypoints = [];
+      drawWaypoints();
+      token = "";
       divVisibility("logged_in", "none");
+      divVisibility("login", "block");
       divVisibility("project_creator", "none");
       divVisibility("project_admin", "none");
       openTab("login_tab");
+      divVisibility("register");
     });
     divVisibility("logged_in", "block");
+    divVisibility("login", "none");
+    divVisibility("register", "none");
     openTab("project_tab");
     listProjects();
   }
 
   function loginMsc() {
+    var register = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
     msc_url = document.getElementById("mscolab_url").value;
     msc_url = msc_url.includes("localhost") || msc_url.includes("127.0.0.1") ? msc_url : msc_url.replace("http://", "https://");
     var email = document.getElementById("mscolab_email").value;
     var password = document.getElementById("mscolab_password").value;
-    var data = {
-      "password": password,
-      "email": email
-    };
-    requestMsc("token", "Post", data, postLogin);
+
+    if (register) {
+      var name = document.getElementById("mscolab_name").value;
+
+      if (document.getElementById("mscolab_password_rpt").value != password) {
+        document.getElementById("status").innerHTML = "Your passwords didn't match!".fontcolor("red");
+        return;
+      }
+
+      var data = {
+        "password": password,
+        "email": email,
+        "username": name
+      };
+      requestMsc("register", "Post", data, function (result) {
+        if (result.success) {
+          openTab("login_tab");
+          document.getElementById("status").innerHTML = "Successfully registered!<br>You can login now.".fontcolor("green");
+        } else {
+          document.getElementById("status").innerHTML = result.message.fontcolor("red");
+        }
+      });
+    } else {
+      var data = {
+        "password": password,
+        "email": email
+      };
+      requestMsc("token", "Post", data, postLogin);
+    }
   }
 
-  document.getElementById("mscolab_login").onclick = loginMsc;
+  document.getElementById("mscolab_login").onclick = function () {
+    return loginMsc();
+  };
+
+  document.getElementById("mscolab_logout").onclick = function () {
+    return socket.disconnect();
+  };
+
+  document.getElementById("mscolab_delete_user").onclick = function () {
+    return requestMsc("delete_user", "Post", {
+      "token": token
+    }, function () {
+      return socket.disconnect();
+    });
+  };
+
+  document.getElementById("mscolab_register").onclick = function () {
+    return loginMsc(true);
+  };
+
   document.getElementById("chat_send").onclick = sendMessage;
   document.getElementById("project_create_ok").onclick = createProject;
   document.getElementById("project_manage").onclick = inviteUser;
@@ -654,6 +720,10 @@ function () {
 
   document.getElementById("login_link").onclick = function () {
     return openTab("login_tab");
+  };
+
+  document.getElementById("register_link").onclick = function () {
+    return openTab("register_tab");
   };
 
   document.getElementById("project_link").onclick = function () {
@@ -668,6 +738,7 @@ function () {
     return openTab("chat_tab");
   };
 
+  divVisibility("register");
   document.getElementById("mscolab_email").addEventListener("keyup", function (e) {
     return e.stopPropagation();
   }, false);
@@ -680,10 +751,22 @@ function () {
   document.getElementById("mscolab_password").addEventListener("keydown", function (e) {
     return e.stopPropagation();
   }, false);
+  document.getElementById("mscolab_password_rpt").addEventListener("keyup", function (e) {
+    return e.stopPropagation();
+  }, false);
+  document.getElementById("mscolab_password_rpt").addEventListener("keydown", function (e) {
+    return e.stopPropagation();
+  }, false);
   document.getElementById("mscolab_url").addEventListener("keyup", function (e) {
     return e.stopPropagation();
   }, false);
   document.getElementById("mscolab_url").addEventListener("keydown", function (e) {
+    return e.stopPropagation();
+  }, false);
+  document.getElementById("mscolab_name").addEventListener("keyup", function (e) {
+    return e.stopPropagation();
+  }, false);
+  document.getElementById("mscolab_name").addEventListener("keydown", function (e) {
     return e.stopPropagation();
   }, false);
   document.getElementById("mscolab_http_user").addEventListener("keyup", function (e) {

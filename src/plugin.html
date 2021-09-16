@@ -3,6 +3,9 @@
     <div class="plugin-content">
         <div class="tab">
             <button class="tablinks active" id="login_link">Login</button>
+            <div name="register" style="display: none;">
+                <button class="tablinks" id="register_link">Register</button>
+            </div>
             <div name="logged_in" style="display: none;">
                 <button class="tablinks" id="project_link">Projects</button>
                 <div name="waypoints">
@@ -13,14 +16,26 @@
                 <button class="tablinks" id="manage_link">Manage</button>
             </div>
           </div>
+
         <div id="login_tab" class="tabcontent" style="display: block;">
             Please enter credentials <br>
 
             <input type="text" id="mscolab_url" value="" placeholder="Mscolab URL"><br>
             <input type="text" id="mscolab_email" value="" placeholder="Your Email"><br>
             <input type="password" id="mscolab_password" value="" placeholder="Your Password"><br>
-            <button id="mscolab_login">Login</button><br>
-            <div id="status"></div>
+            <div id="register_tab" class="tabcontent" style="padding: 0px;">
+                <input type="password" id="mscolab_password_rpt" value="" placeholder="Repeat Your Password"><br>
+                <input type="text" id="mscolab_name" value="" placeholder="Your Name"><br>
+                <button id="mscolab_register">Register</button><br>
+            </div>
+            <div name="login">
+                <button id="mscolab_login">Login</button><br>
+            </div>
+            <div name="logged_in" style="display: none;">
+                <button id="mscolab_logout">Logout</button>
+                <button id="mscolab_delete_user" style="float: right;">Delete Account</button><br>
+            </div>
+            <div id="status" style="font-size: large;"></div>
             <div id="http-auth" style="display: none;">
                 The server requested additional http authentication<br>
                 <input type="text" id="mscolab_http_user" value="" placeholder="HTTP Auth Username"><br>
@@ -35,6 +50,7 @@
                 <input type="text" id="project_create_path" value="" placeholder="Project Path"><br>
                 <textarea id="project_create_description" value="" placeholder="Project Description"></textarea><br>
                 <button id="project_create_ok">Create</button>
+                <div id="project_status" style="font-size: large;"></div>
             </div>
             <div name="waypoints">
                 Waypoints<br>
@@ -106,6 +122,14 @@
 
             document.getElementById(tabName).style.display = "block";
             document.getElementById(tabName.replace("tab", "link")).className += " active";
+
+            if(tabName == "login_tab" && !token) divVisibility("login");
+            else divVisibility("login", "none");
+
+            if(tabName == "register_tab"){
+                tabName = "login_tab";
+                document.getElementById(tabName).style.display = "block";
+            }
         }
 
         function requestMsc(endpoint="", method="Get", data={"token": token}, callback=null){
@@ -140,8 +164,12 @@
                                                                       } catch(e) {
                                                                         data = text;
                                                                       } callback(data);})
-                                        .catch(error => {console.log(error); document.getElementById("status").innerHTML = error.toString().fontcolor("red");
-                                                         if(error.toString().toLowerCase().includes("unauthorized")) document.getElementById("http-auth").style.display = "block";});
+                                        .catch(error => {console.log(error); document.getElementById("status").innerHTML = (endpoint + " " + error.toString()).fontcolor("red");
+                                                         if(error.toString().toLowerCase().includes("unauthorized")) document.getElementById("http-auth").style.display = "block";
+                                                         if(error.toString().toLowerCase().includes("response_data.user is undefined")) document.getElementById("status").innerHTML = "Login data was incorrect!".fontcolor("red");
+                                                         if(error.toString().toLowerCase().includes("networkerror")) document.getElementById("status").innerHTML = "Mscolab Server did not respond!".fontcolor("red");
+                                                         if(error.toString().toLowerCase().includes("forbidden")) document.getElementById("status").innerHTML = "Your Mscolab URL was likely false!".fontcolor("red");
+                                                        });
             }
         }
 
@@ -276,7 +304,10 @@
             var data = {"token": token, "path": path, "description": description};
 
             if(path.length > 0){
-                requestMsc("create_project", "Post", data, listProjects);
+                requestMsc("create_project", "Post", data, (response) => {
+                    if(response == "True") listProjects();
+                    else document.getElementById("project_status").innerHTML = "A project with that name already exists!".fontcolor("red");
+                });
             }
         }
 
@@ -326,7 +357,7 @@
                 var users = response_data.users;
                 for(var user of users){
                     var li = `<li>${user[0]}`;
-                    var select = `<select id="perm_${user[1]}_${user[0]}" style="width: 30%; float: right; padding: 0px; border-width: 0px; height: 19px;">
+                    var select = `<select id="perm_${user[1]}_${user[0]}" style="width: 35%; float: right; padding: 0px 12px; border-width: 0px; height: 19px;">
                                     <option value="admin">Admin</option>
                                     <option value="collaborator">Collaborator</option>
                                     <option value="viewer">Viewer</option>
@@ -342,6 +373,7 @@
         }
 
         function projectSelected(){
+            document.getElementById("project_status").innerHTML = "";
             var id = getSelectedProject();
             var access = getSelectedAccessLevel();
 
@@ -399,6 +431,8 @@
                 waypoints = [];
                 drawWaypoints();
                 divVisibility("waypoints", "none");
+                divVisibility("project_creator", "none");
+                divVisibility("project_admin", "none");
                 document.getElementById("project_create").style.display = "block";
             }
         }
@@ -430,6 +464,7 @@
             document.getElementById("project_create_description").value = "";
 
             function onLoad(response_data){
+                console.log(response_data);
                 projects = response_data["projects"];
                 document.getElementById("project_list").innerHTML = `Projects: <select name="projects" id="selected_project"></select>`;
                 for(var project_index in projects){
@@ -451,8 +486,8 @@
             var data = {"token": token}
             var username = response_data["user"]["username"];
             userId = response_data["user"]["id"];
-            var test = document.getElementById("project_username");
-            test.innerHTML = "Logged in as " + username;
+            var p_username = document.getElementById("project_username");
+            p_username.innerHTML = "Logged in as " + username;
             if(socket) socket.disconnect();
             socket = io.connect(msc_url);
             var onevent = socket.onevent;
@@ -477,45 +512,80 @@
             socket.on('disconnect',function() {
                 console.log('The client has disconnected!');
                 socket.disconnect();
+                waypoints = [];
+                drawWaypoints();
+                token = "";
                 divVisibility("logged_in", "none");
+                divVisibility("login", "block");
                 divVisibility("project_creator", "none");
                 divVisibility("project_admin", "none");
                 openTab("login_tab");
+                divVisibility("register");
             });
 
             divVisibility("logged_in", "block");
+            divVisibility("login", "none");
+            divVisibility("register", "none");
             openTab("project_tab")
             listProjects();
         }
 
-        function loginMsc(){
+        function loginMsc(register=false){
             // Can't fetch http on windy, only https
             msc_url = document.getElementById("mscolab_url").value
             msc_url = msc_url.includes("localhost") || msc_url.includes("127.0.0.1") ? msc_url : msc_url.replace("http://", "https://");
 
             var email = document.getElementById("mscolab_email").value;
             var password = document.getElementById("mscolab_password").value;
-            var data = {"password": password, "email": email};
-            requestMsc("token", "Post", data, postLogin);
+            
+            if(register){
+                var name = document.getElementById("mscolab_name").value;
+                if(document.getElementById("mscolab_password_rpt").value != password){
+                    document.getElementById("status").innerHTML = "Your passwords didn't match!".fontcolor("red");
+                    return;
+                }
+
+                var data = {"password": password, "email": email, "username": name};
+                requestMsc("register", "Post", data, (result) => {
+                    if(result.success){
+                        openTab("login_tab");
+                        document.getElementById("status").innerHTML = "Successfully registered!<br>You can login now.".fontcolor("green");
+                    } else {
+                        document.getElementById("status").innerHTML = result.message.fontcolor("red");
+                    }
+                });
+            } else {
+                var data = {"password": password, "email": email};
+                requestMsc("token", "Post", data, postLogin);
+            }
         }
 
-        document.getElementById("mscolab_login").onclick = loginMsc;
+        document.getElementById("mscolab_login").onclick = () => loginMsc();
+        document.getElementById("mscolab_logout").onclick = () => socket.disconnect();
+        document.getElementById("mscolab_delete_user").onclick = () => requestMsc("delete_user", "Post", {"token": token}, () => socket.disconnect());
+        document.getElementById("mscolab_register").onclick = () => loginMsc(true);
         document.getElementById("chat_send").onclick = sendMessage;
         document.getElementById("project_create_ok").onclick = createProject;
         document.getElementById("project_manage").onclick = inviteUser;
         document.getElementById("project_manage_delete").onclick = deleteProject;
         document.getElementById("login_link").onclick = () => openTab("login_tab");
+        document.getElementById("register_link").onclick = () => openTab("register_tab");
         document.getElementById("project_link").onclick = () => openTab("project_tab");
         document.getElementById("manage_link").onclick = () => openTab("manage_tab");
         document.getElementById("chat_link").onclick = () => openTab("chat_tab");
+        divVisibility("register");
 
         // Disable Windy shortcuts while inputting information
         document.getElementById("mscolab_email").addEventListener("keyup", (e) => e.stopPropagation(), false);
         document.getElementById("mscolab_email").addEventListener("keydown", (e) => e.stopPropagation(), false);
         document.getElementById("mscolab_password").addEventListener("keyup", (e) => e.stopPropagation(), false);
         document.getElementById("mscolab_password").addEventListener("keydown", (e) => e.stopPropagation(), false);
+        document.getElementById("mscolab_password_rpt").addEventListener("keyup", (e) => e.stopPropagation(), false);
+        document.getElementById("mscolab_password_rpt").addEventListener("keydown", (e) => e.stopPropagation(), false);
         document.getElementById("mscolab_url").addEventListener("keyup", (e) => e.stopPropagation(), false);
         document.getElementById("mscolab_url").addEventListener("keydown", (e) => e.stopPropagation(), false);
+        document.getElementById("mscolab_name").addEventListener("keyup", (e) => e.stopPropagation(), false);
+        document.getElementById("mscolab_name").addEventListener("keydown", (e) => e.stopPropagation(), false);
         document.getElementById("mscolab_http_user").addEventListener("keyup", (e) => e.stopPropagation(), false);
         document.getElementById("mscolab_http_user").addEventListener("keydown", (e) => e.stopPropagation(), false);
         document.getElementById("mscolab_http_password").addEventListener("keyup", (e) => e.stopPropagation(), false);
