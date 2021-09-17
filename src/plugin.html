@@ -7,12 +7,12 @@
                 <button class="tablinks" id="register_link">Register</button>
             </div>
             <div name="logged_in" style="display: none;">
-                <button class="tablinks" id="project_link">Projects</button>
+                <button class="tablinks" id="operation_link">Operations</button>
                 <div name="waypoints">
                     <button class="tablinks" id="chat_link">Chat</button>
                 </div>
             </div>
-            <div name="project_admin" style="display: none;">
+            <div name="operation_admin" style="display: none;">
                 <button class="tablinks" id="manage_link">Manage</button>
             </div>
           </div>
@@ -43,14 +43,14 @@
             </div>
         </div>
 
-        <div id="project_tab" class="tabcontent">
-            <div id="project_username"></div><br>
-            <div id="project_list"></div><br>
-            <div id="project_create" style="display: none;">
-                <input type="text" id="project_create_path" value="" placeholder="Project Path"><br>
-                <textarea id="project_create_description" value="" placeholder="Project Description"></textarea><br>
-                <button id="project_create_ok">Create</button>
-                <div id="project_status" style="font-size: large;"></div>
+        <div id="operation_tab" class="tabcontent">
+            <div id="operation_username"></div><br>
+            <div id="operation_list"></div><br>
+            <div id="operation_create" style="display: none;">
+                <input type="text" id="operation_create_path" value="" placeholder="Operation Path"><br>
+                <textarea id="operation_create_description" value="" placeholder="Operation Description"></textarea><br>
+                <button id="operation_create_ok">Create</button>
+                <div id="operation_status" style="font-size: large;"></div>
             </div>
             <div name="waypoints">
                 Waypoints<br>
@@ -59,19 +59,19 @@
         </div>
 
         <div id="manage_tab" class="tabcontent">
-            <div name="project_admin" style="display: none;">
-                Add a user to your project:<br>
-                <select id="project_manage_user"></select>
-                <select id="project_manage_permission">
+            <div name="operation_admin" style="display: none;">
+                Add a user to your operation:<br>
+                <select id="operation_manage_user"></select>
+                <select id="operation_manage_permission">
                     <option value="admin">Admin</option>
                     <option value="collaborator">Collaborator</option>
                     <option value="viewer">Viewer</option>
-                </select><button id="project_manage">Add</button><br>
-                Users in this project:<br>
-                <ul id="project_manage_user_list"></ul><br><br>
-                <div name="project_creator" style="display: none;">
-                    Delete your project:<br>
-                    <button id="project_manage_delete">Delete</button><br>
+                </select><button id="operation_manage">Add</button><br>
+                Users in this operation:<br>
+                <ul id="operation_manage_user_list"></ul><br><br>
+                <div name="operation_creator" style="display: none;">
+                    Delete your operation:<br>
+                    <button id="operation_manage_delete">Delete</button><br>
                 </div>
             </div>
         </div>
@@ -86,13 +86,13 @@
         import map from '@windy/map';
         import bcast from '@windy/broadcast';
         var token = null;
-        var projects = null;
+        var operations = null;
         var userId = null;
         var msc_url = "";
         var waypoints = [];
         var markers = [];
         var socket = null;
-        var selectedProject = -1;
+        var selectedOperation = -1;
 
         const icon = L.divIcon({
             className: 'weather-at-city',
@@ -173,7 +173,7 @@
             }
         }
 
-        function updateProject(){
+        function updateOperation(){
             var xmlEnd = `</ListOfWaypoints></FlightTrack>`;
             var xmlBegin = `<?xml version="1.0" ?><FlightTrack version="4.0.4."><ListOfWaypoints>`;
             var xmlWaypoint = `<Waypoint flightlevel="ALTITUDE" lat="LATITUDE" location="LOCATION" lon="LONGITUDE"><Comments>COMMENT</Comments></Waypoint>`;
@@ -188,16 +188,16 @@
                 .replace("COMMENT", com).replace("LOCATION", name));
             }
             const file = xmlBegin + xmlWaypoints.join() + xmlEnd;
-            socket.emit("file-save", {"token": token, "p_id": parseInt(getSelectedProject()), "content": file, "comment": "Updated through Windy."});
+            socket.emit("file-save", {"token": token, "p_id": parseInt(getSelectedOperation()), "content": file, "comment": "Updated through Windy."});
         }
 
-        function projectUpdated(event){
+        function operationUpdated(event){
             event = JSON.parse(event);
             const p_id = event["p_id"];
             const u_id = event["u_id"];
-            if(p_id == getSelectedProject() && u_id != userId){
-                console.log('Updating project ' + p_id);
-                projectSelected();
+            if(p_id == getSelectedOperation() && u_id != userId){
+                console.log('Updating operation ' + p_id);
+                operationSelected();
             }
         }
 
@@ -206,8 +206,8 @@
             const p_id = event["p_id"];
             const u_id = event["u_id"];
             if(u_id == userId){
-                console.log('Removing project ' + p_id);
-                listProjects();
+                console.log('Removing operation ' + p_id);
+                listOperations();
             }
         }
 
@@ -215,9 +215,9 @@
             event = JSON.parse(event);
             const p_id = event["p_id"];
             const u_id = event["u_id"];
-            if(p_id == getSelectedProject() && u_id == userId){
+            if(p_id == getSelectedOperation() && u_id == userId){
                 console.log('Updating permission for ' + p_id);
-                listProjects();
+                listOperations();
             }
         }
 
@@ -227,7 +227,7 @@
             const u_id = event["u_id"];
             if(u_id == userId){
                 console.log('New permission for ' + p_id);
-                listProjects();
+                listOperations();
             }
         }
 
@@ -241,7 +241,7 @@
                 waypoints[wp_index]["lon"] = new_lon;
                 waypoints[wp_index]["name"] = "";
                 drawWaypoints();
-                updateProject();
+                updateOperation();
             }
         }
 
@@ -253,7 +253,7 @@
                     map.setView({lat: latlon["lat"], lng: latlon["lng"]})
                 });
                 drawWaypoints();
-                updateProject();
+                updateOperation();
             }
         }
 
@@ -263,14 +263,14 @@
                 console.log(`Waypoint ${index} removed`);
                 waypoints.splice(index, 1);
                 drawWaypoints();
-                updateProject();
+                updateOperation();
             }
         }
 
         function sendMessage(){
             var message = document.getElementById("chat_message").value;
             if(message.length > 0){
-                socket.emit("chat-message", {"token": token, "p_id": parseInt(getSelectedProject()), "message_text": message, "reply_id": -1});
+                socket.emit("chat-message", {"token": token, "p_id": parseInt(getSelectedOperation()), "message_text": message, "reply_id": -1});
                 document.getElementById("chat_message").value = "";
             }
         }
@@ -281,15 +281,15 @@
         }
 
         function inviteUser(){
-            var p_id = getSelectedProject();
-            var u_id = document.getElementById("project_manage_user").value;
-            var access = document.getElementById("project_manage_permission").value;
+            var p_id = getSelectedOperation();
+            var u_id = document.getElementById("operation_manage_user").value;
+            var access = document.getElementById("operation_manage_permission").value;
             var data = {"token": token, "p_id": p_id, "selected_userids": `[${u_id}]`, "selected_access_level": access};
             requestMsc("add_bulk_permissions", "Post", data, loadUsers);
         }
 
         function updateUser(u_id, access){
-            var p_id = getSelectedProject();
+            var p_id = getSelectedOperation();
             if(access != "remove"){
                 var data = {"token": token, "p_id": p_id, "selected_userids": `[${u_id}]`, "selected_access_level": access};
                 requestMsc("modify_bulk_permissions", "Post", data, loadUsers);
@@ -299,22 +299,22 @@
             }
         }
 
-        function deleteProject(){
-            var id = getSelectedProject();
+        function deleteOperation(){
+            var id = getSelectedOperation();
             var data = {"p_id": id, "token": token};
-            requestMsc("delete_project", "Post", data, listProjects);
-            openTab("project_tab");
+            requestMsc("delete_operation", "Post", data, listOperations);
+            openTab("operation_tab");
         }
 
-        function createProject(){
-            var path = document.getElementById("project_create_path").value;
-            var description = document.getElementById("project_create_description").value;
+        function createOperation(){
+            var path = document.getElementById("operation_create_path").value;
+            var description = document.getElementById("operation_create_description").value;
             var data = {"token": token, "path": path, "description": description};
 
             if(path.length > 0){
-                requestMsc("create_project", "Post", data, (response) => {
-                    if(response == "True") listProjects();
-                    else document.getElementById("project_status").innerHTML = "A project with that name already exists!".fontcolor("red");
+                requestMsc("create_operation", "Post", data, (response) => {
+                    if(response == "True") listOperations();
+                    else document.getElementById("operation_status").innerHTML = "A operation with that name already exists!".fontcolor("red");
                 });
             }
         }
@@ -355,13 +355,13 @@
         function loadUsers(){
             function onLoad(response_data){
                 var users = response_data.users;
-                document.getElementById("project_manage_user").innerHTML = "";
+                document.getElementById("operation_manage_user").innerHTML = "";
                 for(var user of users){
-                    document.getElementById("project_manage_user").innerHTML += `<option value="${user[1]}">${user[0]}</option>`;
+                    document.getElementById("operation_manage_user").innerHTML += `<option value="${user[1]}">${user[0]}</option>`;
                 }
             }
             function onAddedUsers(response_data){
-                document.getElementById("project_manage_user_list").innerHTML = "";
+                document.getElementById("operation_manage_user_list").innerHTML = "";
                 var users = response_data.users;
                 for(var user of users){
                     var li = `<li>${user[0]}`;
@@ -372,23 +372,23 @@
                                     <option value="remove">Remove</option>
                                   </select></li>`
                     select = select.replace(user[1] + "\"", user[1] + "\" selected");
-                    document.getElementById("project_manage_user_list").innerHTML += li + select;
+                    document.getElementById("operation_manage_user_list").innerHTML += li + select;
                     document.getElementById(`perm_${user[1]}_${user[0]}`).onchange = () => updateUser(user[2], document.getElementById(`perm_${user[1]}_${user[0]}`).value);
                 }
             }
-            requestMsc("users_without_permission", "Get", {"token": token, "p_id": parseInt(getSelectedProject())}, onLoad);
-            requestMsc("users_with_permission", "Get", {"token": token, "p_id": parseInt(getSelectedProject())}, onAddedUsers);
+            requestMsc("users_without_permission", "Get", {"token": token, "p_id": parseInt(getSelectedOperation())}, onLoad);
+            requestMsc("users_with_permission", "Get", {"token": token, "p_id": parseInt(getSelectedOperation())}, onAddedUsers);
         }
 
-        function projectSelected(){
-            document.getElementById("project_status").innerHTML = "";
-            var id = getSelectedProject();
+        function operationSelected(){
+            document.getElementById("operation_status").innerHTML = "";
+            var id = getSelectedOperation();
             var access = getSelectedAccessLevel();
 
-            function loadProject(response_data){
+            function loadOperation(response_data){
                 var parser = new DOMParser();
-                var project = parser.parseFromString(response_data.content, "text/xml");
-                var xml_waypoints = project.getElementsByTagName("Waypoint");
+                var operation = parser.parseFromString(response_data.content, "text/xml");
+                var xml_waypoints = operation.getElementsByTagName("Waypoint");
                 waypoints = [];
                 var max_lat = -1000;
                 var min_lat = 1000;
@@ -406,53 +406,53 @@
                     waypoints.push({"lat": lat, "lon": lon, "alt": alt, "name": name, "zoom": () => map.setView({ lat: lat, lng: lon })})
                 }
 
-                if(selectedProject != id){
+                if(selectedOperation != id){
                     var southWest = L.latLng(min_lat, min_lon),
                         northEast = L.latLng(max_lat, max_lon),
                         bounds = L.latLngBounds(southWest, northEast);
                     map.fitBounds(bounds);
                 }
 
-                selectedProject = id;
+                selectedOperation = id;
                 drawWaypoints();
                 
                 divVisibility("waypoints", "block");
                 if(access == "creator" || access == "admin"){
-                    divVisibility("project_admin", "block");
+                    divVisibility("operation_admin", "block");
                     if(access == "creator")
-                        divVisibility("project_creator", "block");
+                        divVisibility("operation_creator", "block");
                     else
-                        divVisibility("project_creator", "none");
+                        divVisibility("operation_creator", "none");
                     loadUsers();
                 }
                 else{
-                    divVisibility("project_creator", "none");
-                    divVisibility("project_admin", "none");
+                    divVisibility("operation_creator", "none");
+                    divVisibility("operation_admin", "none");
                 }
             }
             if(id > -1){
-                document.getElementById("project_create").style.display = "none";
+                document.getElementById("operation_create").style.display = "none";
                 var data = {"token": token, "p_id": id};
-                requestMsc("get_project_by_id", "Get", data, loadProject);
+                requestMsc("get_operation_by_id", "Get", data, loadOperation);
                 loadChat();
             } else {
                 waypoints = [];
                 drawWaypoints();
                 divVisibility("waypoints", "none");
-                divVisibility("project_creator", "none");
-                divVisibility("project_admin", "none");
-                document.getElementById("project_create").style.display = "block";
+                divVisibility("operation_creator", "none");
+                divVisibility("operation_admin", "none");
+                document.getElementById("operation_create").style.display = "block";
             }
         }
 
-        function getSelectedProject(){
-            return document.getElementById("selected_project").value;
+        function getSelectedOperation(){
+            return document.getElementById("selected_operation").value;
         }
 
         function getSelectedAccessLevel(){
-            var id = getSelectedProject();
-            var project = document.getElementById(`p_${id}`);
-            if(project) return project.innerText.split(" ").pop().replace("(", "").replace(")", "");
+            var id = getSelectedOperation();
+            var operation = document.getElementById(`p_${id}`);
+            if(operation) return operation.innerText.split(" ").pop().replace("(", "").replace(")", "");
         }
 
         function loadChat(){
@@ -463,29 +463,29 @@
                     document.getElementById("chat_list").innerHTML += `<li id="Chat_${message.id}"><${message.time}> ${message.username} said:<br>${message.text}</li>`;
                 }
             }
-            var data = {"token": token, "p_id": getSelectedProject()};
+            var data = {"token": token, "p_id": getSelectedOperation()};
             requestMsc("messages", "Get", data, onLoaded);
         }
 
-        function listProjects(){
-            document.getElementById("project_create_path").value = "";
-            document.getElementById("project_create_description").value = "";
+        function listOperations(){
+            document.getElementById("operation_create_path").value = "";
+            document.getElementById("operation_create_description").value = "";
 
             function onLoad(response_data){
-                projects = response_data["projects"];
-                document.getElementById("project_list").innerHTML = `Projects: <select name="projects" id="selected_project"></select>`;
-                for(var project_index in projects){
-                    var project = projects[project_index];
-                    document.getElementById("selected_project").innerHTML += `<option id="p_${project['p_id']}" value="${project['p_id']}">${project["path"]} (${project["access_level"]})</option>`;
+                operations = response_data["operations"];
+                document.getElementById("operation_list").innerHTML = `Operations: <select name="operations" id="selected_operation"></select>`;
+                for(var operation_index in operations){
+                    var operation = operations[operation_index];
+                    document.getElementById("selected_operation").innerHTML += `<option id="p_${operation['p_id']}" value="${operation['p_id']}">${operation["path"]} (${operation["access_level"]})</option>`;
                 }
-                document.getElementById("selected_project").innerHTML += `<option value="-1">Create New Project</option>`;
-                document.getElementById("selected_project").innerHTML = document.getElementById("selected_project").innerHTML.replace(`p_${selectedProject}"`, `p_${selectedProject}" selected`);
-                document.getElementById("selected_project").onchange = projectSelected;
-                projectSelected();
+                document.getElementById("selected_operation").innerHTML += `<option value="-1">Create New Operation</option>`;
+                document.getElementById("selected_operation").innerHTML = document.getElementById("selected_operation").innerHTML.replace(`p_${selectedOperation}"`, `p_${selectedOperation}" selected`);
+                document.getElementById("selected_operation").onchange = operationSelected;
+                operationSelected();
             }
 
             var data = {"token": token};
-            requestMsc("projects", "Get", data, onLoad);
+            requestMsc("operations", "Get", data, onLoad);
         }
 
         function postLogin(response_data){
@@ -493,7 +493,7 @@
             var data = {"token": token}
             var username = response_data["user"]["username"];
             userId = response_data["user"]["id"];
-            var p_username = document.getElementById("project_username");
+            var p_username = document.getElementById("operation_username");
             p_username.innerHTML = "Logged in as " + username;
             if(socket) socket.disconnect();
             socket = io.connect(msc_url);
@@ -510,12 +510,12 @@
                 socket.emit("start", data);
             });
             // Add a connect listener
-            socket.on('file-changed', projectUpdated);
+            socket.on('file-changed', operationUpdated);
             socket.on('chat-message-client', messageReceived);
             socket.on('revoke-permission', onAccessRevoked);
             socket.on('update-permission', onPermissionUpdated);
             socket.on('new-permission', onNewPermission);
-            socket.on('project-deleted', () => listProjects());
+            socket.on('operation-deleted', () => listOperations());
             socket.on('*', (event, data) => console.log(`Received event ${event}: ${data}`));
             // Add a disconnect listener
             socket.on('disconnect',function() {
@@ -526,8 +526,8 @@
                 token = "";
                 divVisibility("logged_in", "none");
                 divVisibility("login", "block");
-                divVisibility("project_creator", "none");
-                divVisibility("project_admin", "none");
+                divVisibility("operation_creator", "none");
+                divVisibility("operation_admin", "none");
                 openTab("login_tab");
                 divVisibility("register");
             });
@@ -535,8 +535,8 @@
             divVisibility("logged_in", "block");
             divVisibility("login", "none");
             divVisibility("register", "none");
-            openTab("project_tab")
-            listProjects();
+            openTab("operation_tab")
+            listOperations();
         }
 
         function loginMsc(register=false){
@@ -574,12 +574,12 @@
         document.getElementById("mscolab_delete_user").onclick = () => requestMsc("delete_user", "Post", {"token": token}, () => socket.disconnect());
         document.getElementById("mscolab_register").onclick = () => loginMsc(true);
         document.getElementById("chat_send").onclick = sendMessage;
-        document.getElementById("project_create_ok").onclick = createProject;
-        document.getElementById("project_manage").onclick = inviteUser;
-        document.getElementById("project_manage_delete").onclick = deleteProject;
+        document.getElementById("operation_create_ok").onclick = createOperation;
+        document.getElementById("operation_manage").onclick = inviteUser;
+        document.getElementById("operation_manage_delete").onclick = deleteOperation;
         document.getElementById("login_link").onclick = () => openTab("login_tab");
         document.getElementById("register_link").onclick = () => openTab("register_tab");
-        document.getElementById("project_link").onclick = () => openTab("project_tab");
+        document.getElementById("operation_link").onclick = () => openTab("operation_tab");
         document.getElementById("manage_link").onclick = () => openTab("manage_tab");
         document.getElementById("chat_link").onclick = () => openTab("chat_tab");
         divVisibility("register");
@@ -601,10 +601,10 @@
         document.getElementById("mscolab_http_password").addEventListener("keydown", (e) => e.stopPropagation(), false);
         document.getElementById("chat_message").addEventListener("keyup", (e) => e.stopPropagation(), false);
         document.getElementById("chat_message").addEventListener("keydown", (e) => e.stopPropagation(), false);
-        document.getElementById("project_create_path").addEventListener("keyup", (e) => e.stopPropagation(), false);
-        document.getElementById("project_create_path").addEventListener("keydown", (e) => e.stopPropagation(), false);
-        document.getElementById("project_create_description").addEventListener("keyup", (e) => e.stopPropagation(), false);
-        document.getElementById("project_create_description").addEventListener("keydown", (e) => e.stopPropagation(), false);
+        document.getElementById("operation_create_path").addEventListener("keyup", (e) => e.stopPropagation(), false);
+        document.getElementById("operation_create_path").addEventListener("keydown", (e) => e.stopPropagation(), false);
+        document.getElementById("operation_create_description").addEventListener("keyup", (e) => e.stopPropagation(), false);
+        document.getElementById("operation_create_description").addEventListener("keydown", (e) => e.stopPropagation(), false);
 
         map.on("click", addWaypoint);
         map.on("popupopen", popupOpened);
