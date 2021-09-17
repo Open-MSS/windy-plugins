@@ -14,7 +14,7 @@ W.loadPlugin(
 /* Mounting options */
 {
   "name": "windy-plugin-mscolab",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "author": "May Bär",
   "repository": {
     "type": "git",
@@ -232,6 +232,17 @@ function () {
     }
   }
 
+  function onNewPermission(event) {
+    event = JSON.parse(event);
+    var p_id = event["p_id"];
+    var u_id = event["u_id"];
+
+    if (u_id == userId) {
+      console.log('New permission for ' + p_id);
+      listProjects();
+    }
+  }
+
   function moveWaypoint(event) {
     if (waypoints.length > 0) {
       var wp_index = event["target"]["options"]["title"] - 1;
@@ -319,7 +330,6 @@ function () {
         "selected_userids": "[".concat(u_id, "]"),
         "selected_access_level": access
       };
-      console.log(data);
       requestMsc("modify_bulk_permissions", "Post", data, loadUsers);
     } else {
       var data = {
@@ -327,7 +337,6 @@ function () {
         "p_id": p_id,
         "selected_userids": "[".concat(u_id, "]")
       };
-      console.log(data);
       requestMsc("delete_bulk_permissions", "Post", data, loadUsers);
     }
   }
@@ -584,7 +593,6 @@ function () {
     document.getElementById("project_create_description").value = "";
 
     function onLoad(response_data) {
-      console.log(response_data);
       projects = response_data["projects"];
       document.getElementById("project_list").innerHTML = "Projects: <select name=\"projects\" id=\"selected_project\"></select>";
 
@@ -633,6 +641,10 @@ function () {
     socket.on('chat-message-client', messageReceived);
     socket.on('revoke-permission', onAccessRevoked);
     socket.on('update-permission', onPermissionUpdated);
+    socket.on('new-permission', onNewPermission);
+    socket.on('project-deleted', function () {
+      return listProjects();
+    });
     socket.on('*', function (event, data) {
       return console.log("Received event ".concat(event, ": ").concat(data));
     });

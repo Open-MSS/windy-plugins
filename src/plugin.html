@@ -221,6 +221,16 @@
             }
         }
 
+        function onNewPermission(event){
+            event = JSON.parse(event);
+            const p_id = event["p_id"];
+            const u_id = event["u_id"];
+            if(u_id == userId){
+                console.log('New permission for ' + p_id);
+                listProjects();
+            }
+        }
+
         function moveWaypoint(event){
             if(waypoints.length > 0){
                 const wp_index = event["target"]["options"]["title"] - 1;
@@ -282,11 +292,9 @@
             var p_id = getSelectedProject();
             if(access != "remove"){
                 var data = {"token": token, "p_id": p_id, "selected_userids": `[${u_id}]`, "selected_access_level": access};
-                console.log(data);
                 requestMsc("modify_bulk_permissions", "Post", data, loadUsers);
             } else {
                 var data = {"token": token, "p_id": p_id, "selected_userids": `[${u_id}]`};
-                console.log(data);
                 requestMsc("delete_bulk_permissions", "Post", data, loadUsers);
             }
         }
@@ -464,7 +472,6 @@
             document.getElementById("project_create_description").value = "";
 
             function onLoad(response_data){
-                console.log(response_data);
                 projects = response_data["projects"];
                 document.getElementById("project_list").innerHTML = `Projects: <select name="projects" id="selected_project"></select>`;
                 for(var project_index in projects){
@@ -507,6 +514,8 @@
             socket.on('chat-message-client', messageReceived);
             socket.on('revoke-permission', onAccessRevoked);
             socket.on('update-permission', onPermissionUpdated);
+            socket.on('new-permission', onNewPermission);
+            socket.on('project-deleted', () => listProjects());
             socket.on('*', (event, data) => console.log(`Received event ${event}: ${data}`));
             // Add a disconnect listener
             socket.on('disconnect',function() {
