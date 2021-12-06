@@ -8,7 +8,7 @@ module.exports = {
 
     // List of external libraries, that should be loaded before
     // your plugin is even mounted to the page
-    dependencies: ['https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js'],
+    dependencies: ['https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.0/socket.io.js'],
 
     // List of classnames that will be attached to your plugin upon mounting
     className: 'plugin-lhpane plugin-mobile-fullscreen',

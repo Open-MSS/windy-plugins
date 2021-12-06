@@ -23,7 +23,7 @@ W.loadPlugin(
   "description": "Enables users to connect to and interact with an mscolab server.",
   "displayName": "Mscolab",
   "hook": "menu",
-  "dependencies": ["https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"],
+  "dependencies": ["https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.0/socket.io.js"],
   "className": "plugin-lhpane plugin-mobile-fullscreen"
 },
 /* HTML */
