@@ -1,6 +1,6 @@
 {
     "name": "windy-plugin-mscolab",
-    "version": "0.2.9",
+    "version": "0.2.12",
     "description": "Enables users to connect to and interact with an mscolab server.",
     "main": "dist/plugin.js",
     "scripts": {

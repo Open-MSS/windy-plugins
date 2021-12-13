@@ -14,7 +14,7 @@ W.loadPlugin(
 /* Mounting options */
 {
   "name": "windy-plugin-mscolab",
-  "version": "0.2.9",
+  "version": "0.2.11",
   "author": "May Bär",
   "repository": {
     "type": "git",
@@ -251,6 +251,14 @@ function () {
       waypoints[wp_index]["lat"] = new_lat;
       waypoints[wp_index]["lon"] = new_lon;
       waypoints[wp_index]["name"] = "";
+
+      waypoints[wp_index]["zoom"] = function () {
+        return map.setView({
+          lat: new_lat,
+          lon: new_lon
+        });
+      };
+
       drawWaypoints();
       updateOperation();
     }

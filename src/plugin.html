@@ -241,6 +241,7 @@
                 waypoints[wp_index]["lat"] = new_lat;
                 waypoints[wp_index]["lon"] = new_lon;
                 waypoints[wp_index]["name"] = "";
+                waypoints[wp_index]["zoom"] = () => map.setView({lat: new_lat, lon: new_lon});
                 drawWaypoints();
                 updateOperation();
             }
