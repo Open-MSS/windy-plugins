@@ -1,7 +1,161 @@
 @import 'dev/variables.less';
 
-.onwindy-plugin-myname {
+@widthOfMyPlugin: 400px;
+
+.onwindy-plugin-mscolab {
+    .left-border {
+        left: @widthOfMyPlugin;
+    }
+
+    #search {
+        display: none;
+    }
 }
 
-#windy-plugin-myname {
+#windy-plugin-mscolab {
+    width: @widthOfMyPlugin;
+    height: 100%;
+
+    .plugin-content {
+        padding: 20px 15px 15px 15px;
+        font-size: 14px;
+        line-height: 1.6;
+        color: white;
+        background: rgba(0, 0, 0, 0.5);
+    }
 }
+  /* Style the tab */
+  .tab {
+    overflow: hidden;
+    border: 1px solid #5c5c5c;
+    background-color: #353535;
+  }
+  /* Style the buttons inside the tab */
+  .tab button {
+    background-color: #3535356e;
+    color: whitesmoke;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px;
+    transition: 0.3s;
+    font-size: 17px;
+  }
+  /* Change background color of buttons on hover */
+  .tab button:hover {
+    background-color: #5c5c5c;
+  }
+  /* Create an active/current tablink class */
+  .tab button.active {
+    background-color: #707070;
+  }
+  /* Style the tab content */
+  .tabcontent {
+    display: none;
+    padding: 6px 12px;
+    -webkit-animation: fadeEffect 1s;
+    animation: fadeEffect 1s;
+  }
+  .tabcontent::after {
+    content: "";
+    clear: both;
+    display: block;
+    float: none;
+  }
+  /* Fade in tabs */
+  @-webkit-keyframes fadeEffect {
+    from {opacity: 0;}
+    to {opacity: 1;}
+  }
+  @keyframes fadeEffect {
+    from {opacity: 0;}
+    to {opacity: 1;}
+  }
+
+  select {
+    // Additional resets for further consistency
+    color: whitesmoke;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: rgb(149, 149, 149);
+    border-style: solid;
+    border-width: 2px;
+    padding: 5px;
+    margin: 2px;
+    width: 100%;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: inherit;
+    line-height: inherit;
+  }
+
+  input {
+    // Additional resets for further consistency
+    color: whitesmoke;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: rgb(149, 149, 149);
+    border-style: solid;
+    border-width: 2px;
+    padding: 5px;
+    margin: 2px;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: inherit;
+    line-height: inherit;
+  }
+
+  button {
+    // Additional resets for further consistency
+    color: whitesmoke;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: rgb(149, 149, 149);
+    border-style: solid;
+    border-width: 2px;
+    padding: 5px;
+    margin: 2px;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: inherit;
+    line-height: inherit;
+    transition: font-size 0.3s ease, background-color 0.3s ease;
+  }
+
+  button:hover{
+    background: #5c5c5c;
+  }
+
+  textarea {
+    // Additional resets for further consistency
+    color: whitesmoke;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: rgb(149, 149, 149);
+    border-style: solid;
+    border-width: 2px;
+    padding: 5px;
+    margin: 2px;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: inherit;
+    line-height: inherit;
+  }
+
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+   
+  li {
+    color: whitesmoke;
+    border-bottom: 1px solid #5c5c5c;
+    background-color: rgba(0, 0, 0, 0.3);
+    transition: font-size 0.3s ease, background-color 0.3s ease;
+  }
+   
+  li:last-child {
+    border: none;
+  }
+
+  li:hover{
+      background: #5c5c5c;
+  }

@@ -1,7 +1,7 @@
 {
-    "name": "windy-plugin-examples",
-    "version": "0.5.0",
-    "description": "Windy plugin system enables anyone, with basic knowledge of Javascript to enhance Windy with new functionality (default desc).",
+    "name": "windy-plugin-mscolab",
+    "version": "0.2.12",
+    "description": "Enables users to connect to and interact with an mscolab server.",
     "main": "dist/plugin.js",
     "scripts": {
         "start": "node ./compiler.js --build --watch --prompt --serve --transpile",
@@ -11,9 +11,9 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/windycom/windy-plugins"
+        "url": "git+https://github.com/Marilyth/windy-plugins"
     },
-    "author": "Windyty, S.E.",
+    "author": "May Bär",
     "license": "MIT",
     "dependencies": {
         "@babel/core": "^7.1.2",
@@ -31,8 +31,8 @@
         "ucfirst": "^1.0.0"
     },
     "devDependencies": {
-        "eslint": "^8.1.0",
-        "eslint-plugin-html": "^6.2.0",
-        "prettier": "^2.4.1"
+        "eslint": "^6.6.0",
+        "eslint-plugin-html": "^6.0.0",
+        "prettier": "^1.18.2"
     }
 }
